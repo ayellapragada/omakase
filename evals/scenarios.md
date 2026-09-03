@@ -5,7 +5,8 @@ These scenarios are the maintained behavioral acceptance set for the skill.
 | Prompt or situation | Expected behavior |
 | --- | --- |
 | “Implement GitHub issue #42 and take it through CI.” | Trigger Omakase, resolve the issue and repository, isolate work, implement, validate, publish, and follow CI. |
-| “Fix this bug in Sushi.” | Trigger Omakase because the requested repository change is intended to land. |
+| “Fix this bug in Sushi.” | Trigger Omakase because the requested repository change is intended to land; after validation, commit it, push the task branch, and open or update a pull request without presenting branch-finishing options. |
+| “Fix this bug, but keep the branch local.” | Trigger Omakase and complete implementation and validation, but honor the explicit request not to push or open a pull request. |
 | “Write a quick script that renames these five files.” | Do not trigger unless it belongs to a project-delivery workflow. |
 | “Diagnose this failing test, but don’t change anything.” | Do not trigger; remain read-only. |
 | “Review this diff and report concerns.” | Do not trigger the delivery lifecycle; use review capabilities only. |
