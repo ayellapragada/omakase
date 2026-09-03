@@ -75,7 +75,9 @@ Do not block independent discovery, design, or review behind a long baseline whe
 
 ### Review and publish
 
-Review the completed diff against the task and use the applicable review and branch-finishing skills. When publication is authorized, follow the resolved convention for each artifact, preserve the pull-request template, commit only task changes, push, create or update the pull request, and read the resulting commit and PR state back. Do not merge a protected branch without explicit user or repository authorization.
+Review the completed diff against the task and use the applicable review and branch-finishing skills. Treat a project change intended to land as authorization to publish it through a pull request after validation. Do not present the branch-finishing options menu or ask whether to push; proceed directly to the pull-request path unless the user explicitly asks to keep the work local or an attention condition prevents publication.
+
+On the default publication path, follow the resolved convention for each artifact, preserve the pull-request template, commit only task-related changes, push the task branch, create or update the pull request, and read the resulting commit and PR state back. This default does not authorize merging, force-pushing, releasing, or any destructive or materially broader action.
 
 ### Follow CI and review
 

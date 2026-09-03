@@ -67,6 +67,21 @@ class OmakaseSkillContractTest(unittest.TestCase):
             ),
         )
 
+    def test_defaults_to_publishing_a_pull_request(self):
+        text = SKILL.read_text()
+
+        self.assert_contains_all(
+            text,
+            (
+                "Treat a project change intended to land as authorization to publish",
+                "Do not present the branch-finishing options menu",
+                "commit only task-related changes",
+                "push the task branch",
+                "create or update the pull request",
+                "explicitly asks to keep the work local",
+            ),
+        )
+
     def test_profile_resources_and_metadata_are_present(self):
         metadata = METADATA.read_text()
         guidance = PROJECT_GUIDANCE.read_text()
