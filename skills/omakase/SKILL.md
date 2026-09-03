@@ -1,214 +1,88 @@
 ---
 name: omakase
-description: Use when a requested change to an actual code project is intended to land, especially features, fixes, refactors, tickets, pull requests, CI follow-up, or review follow-up; also use when invoked explicitly as `$omakase`. Do not use for one-off scripts, read-only explanation or review, or diagnosis-only debugging.
+description: Use when a requested change to an actual code project is intended to land, including features, fixes, refactors, tickets, pull requests, CI follow-up, or review follow-up; also use when invoked explicitly as `$omakase`. Do not use for one-off scripts, read-only explanation or review, or diagnosis-only debugging.
 ---
 
 # Omakase
 
-Treat Codex as the application and coding agent. Coordinate the project-delivery lifecycle around it without creating a second agent harness, issue tracker, or workflow engine.
+Coordinate project delivery around Codex without creating another agent harness, tracker, or workflow engine.
 
-## Hybrid trigger
+## Scope
 
-Use this skill implicitly when the user asks for a change to an actual code project that is intended to land. Strong signals include:
+Trigger for repository changes intended to land, including work from an issue or pull request and requests to publish, follow CI, address review, or merge. When activating, say briefly that Omakase applies because the request is project work intended to land.
 
-- a GitHub issue, Shortcut story, or pull request;
-- a feature, bug fix, refactor, migration, or repository change;
-- a request to open a PR, follow CI, address review, merge, or take work across the finish line;
-- explicit invocation with `$omakase`.
-
-Do not trigger for:
-
-- a small one-off or throwaway script outside a project-delivery workflow;
-- read-only explanation, exploration, or code review;
-- diagnosis or debugging when the user did not ask for a fix;
-- ordinary file manipulation that is not intended to land in a repository;
-- monitoring unrelated to coding delivery.
-
-If the boundary is ambiguous, do not silently expand a small request into the full lifecycle. Ask only if the distinction materially affects what will be changed or published.
-
-When activating, say briefly that Omakase is being used because the request is project work intended to land.
+Do not trigger for one-off scripts, read-only exploration or review, diagnosis without a requested fix, ordinary file manipulation, or unrelated monitoring. If intent to deliver is ambiguous and affects what would be changed or published, ask rather than expanding the request silently.
 
 ## Compose existing capabilities
 
-Omakase is the conductor. Do not restate or weaken the detailed workflows owned by other capabilities.
+Omakase is the conductor; use detailed workflows owned by other capabilities instead of restating them.
 
-- Use Superpowers for brainstorming, planning, git worktrees, TDD, systematic debugging, code-review discipline, verification, and branch finishing when their trigger conditions apply.
-- Use the GitHub plugin for GitHub issues, pull requests, review threads, checks, and Actions evidence when available.
-- For Wistia Shortcut or internal-service context, use Grim according to the active `AGENTS.md` instructions. If Grim is not wired into the session, say so instead of searching for a private CLI.
-- Use Codex scheduled follow-ups for delayed CI, review, and merge checks.
-- Follow applicable `AGENTS.md`, repository documentation, pull-request templates, and user instructions as authoritative project policy.
+- Use the applicable Superpowers skills for design, planning, worktrees, TDD, debugging, review, verification, and branch finishing.
+- Use available GitHub tooling for issues, pull requests, reviews, checks, and Actions evidence. `gh-fix-ci` is optional, not a dependency.
+- Use Grim for Wistia Shortcut or internal-service context when required by `AGENTS.md`. If Grim is unavailable, say so rather than searching for a private CLI.
+- Use Codex scheduled follow-ups for delayed CI, review, or merge checks.
+- Treat user instructions, `AGENTS.md`, repository documentation, and pull-request templates as authoritative policy.
 
-The separately installed `gh-fix-ci` skill can be used when the user invokes it or when its approval-oriented workflow is appropriate. Do not make it a mandatory Omakase dependency.
+## Operating defaults
 
-## Review intensity and model routing
+### Lean review
 
-### Lean review by default
+Keep ordinary delivery in the main implementation context. Run focused checks while developing and full applicable validation before publication. Every change intended to land gets one independent review of the completed diff; fix material findings, rerun affected validation, and request at most one scoped re-review when those fixes warrant it.
 
-Keep ordinary delivery in one implementation context, with independent review at the point where it has the most leverage:
+Use `superpowers:subagent-driven-development` only when the user requests exhaustive execution, repository policy requires it, or scale and risk justify implementer-per-task review. Route every dispatch explicitly: cheapest capable tier for mechanical work, a balanced tier for ordinary implementation or review, and the strongest tier for architecture, security, concurrency, difficult debugging, or consequential final review. Always set both model and reasoning effort.
 
-1. Implement directly in the main agent, following the applicable design, TDD, debugging, and verification disciplines.
-2. Run focused validation while developing and the applicable full validation before publication.
-3. For every project change intended to land, request one independent review of the completed diff. Fix valid material findings and rerun affected validation. Request at most one scoped re-review, and only when material findings required fixes.
+### Authority
 
-Do not invoke `superpowers:subagent-driven-development` merely because a plan can be split into tasks. Use its implementer-per-task and reviewer-per-task cycle only when the user requests an exhaustive workflow, repository policy requires it, or the change's scale and risk justify the additional model consumption. Examples include security-sensitive behavior, data migrations, subtle concurrency, or several genuinely independent implementation domains.
+Continue through safe editing, validation, publication, and follow-up already authorized by the delivery request. Ask only for a material product decision, conflicting requirements, missing credentials or permissions, destructive or security-sensitive action, broader scope, speculative repair, or an unauthorized merge or release.
 
-For every subagent dispatch, set both the model and reasoning effort explicitly. Use the cheapest capable tier for mechanical work with complete requirements and a balanced mid-tier for implementation from prose or ordinary review. Reserve the most capable tier for architecture, security, concurrency, difficult debugging, or a consequential final review. Never allow an omitted routing choice to inherit an expensive main-session default accidentally.
+An attention request states what was found, why progress cannot safely continue, the smallest decision or authority needed, and the recommended option.
 
-## Intake
+## Intake and isolation
 
-Before changing files:
+Before editing:
 
-1. Resolve the task source and definition of done.
-2. Resolve the target repository. For a multi-repository scope, inspect only enough repositories to identify the relevant set.
-3. Read applicable instructions and resolve the personal project profile described in [references/project-guidance.md](references/project-guidance.md).
-4. Resolve the repository's writing and naming conventions as described in [references/repository-conventions.md](references/repository-conventions.md) before naming a branch or composing a commit or pull request.
-5. Inspect git status and preserve unrelated user changes.
-6. Ask a question only when the answer is genuinely blocking or would materially change the result.
+1. Resolve the task source, definition of done, and target repository.
+2. Read applicable instructions and the personal project profile in [references/project-guidance.md](references/project-guidance.md).
+3. Resolve artifact-specific writing and naming rules with [references/repository-conventions.md](references/repository-conventions.md).
+4. Inspect Git status and preserve unrelated changes.
+5. Ask only when missing information materially changes the result.
 
-Treat conventions as artifact-specific. Branch names, commit subjects and bodies, pull-request titles and bodies, release notes, and review replies may deliberately use different styles. Do not assume that a commit-message convention also applies to pull-request titles. Explicit instructions and templates win; otherwise infer only a stable pattern from recent representative examples. When evidence is mixed or weak, use a clear neutral style instead of inventing a repository rule.
+Implementation is isolated by default. Reuse a clean task-specific worktree; otherwise use `superpowers:using-git-worktrees`. Without native isolation, use `<primary-checkout>/.worktrees/<task-slug>` after verifying it is ignored. Use that workflow only for environment detection and isolation: the Omakase profile owns setup and validation. Never nest worktrees or alter unrelated ones.
 
-### Personal project profile
+Preserve the task worktree while its pull request is open. After merge, remove only a clean Omakase-created worktree with the expected identity, then delete its local branch. Remote branch deletion requires explicit authorization.
 
-Each repository may have one machine-local `.omakase.local.yml` in its primary checkout. It is personal operational memory, not repository policy, and must be globally ignored by Git. Linked worktrees share that profile; do not copy it into each worktree.
+## Personal project profile
 
-Resolve its path from any checkout with:
+Each repository may have one globally ignored `.omakase.local.yml` in its primary checkout, shared by linked worktrees. Resolve it from this skill directory with:
 
 ```bash
 python3 scripts/profile_path.py --repo <checkout-or-worktree>
 ```
 
-Run that script from this skill's directory, or invoke it by its absolute installed path. Then:
+If it exists, read it after higher-priority repository instructions. If absent, use [assets/omakase.local.example.yml](assets/omakase.local.example.yml) and [references/project-guidance.md](references/project-guidance.md) to create the smallest evidence-backed profile, verify it in the isolated worktree, and tell the user. Update it only with durable, successfully verified machine-local knowledge; never store secrets or transient failures.
 
-- If the profile exists, read it after `AGENTS.md` and repository instructions. Higher-priority instructions always win.
-- If it is absent, inspect the repository and generate a minimal profile from concrete evidence. Start with `assets/omakase.local.example.yml`; omit unknown or unused fields.
-- Prefer established repository entry points such as `bin/setup`, `script/bootstrap`, declared package scripts, or documented Make targets. Record required setup as ordered `bootstrap.steps`, with each step selecting its own `runtime` and `run` command. These may be run without a redundant confirmation when they are safe and within the requested task.
-- Ask before inventing novel shell setup, obtaining secrets, changing infrastructure, weakening checks, or performing destructive operations. Store secret file paths or prerequisite names only, never secret values.
-- Tell the user when a profile is first generated or materially changed, but do not require approval for a safe evidence-backed initial profile.
+## Delivery
 
-Treat the profile as living memory. When worktree setup exposes a problem, diagnose it first. Update the profile only when the fix is durable and reproducible across future worktrees, rerun the affected setup or validation, and retain the change only after it works. Do not encode transient outages, one-off sandbox failures, or speculative workarounds; a stable harness constraint belongs in `worktree.notes` only after a successful verification identifies the required execution context.
+### Plan
 
-A verified bootstrap must leave tracked project files unchanged. Check `git status` after running candidate steps. If setup rewrites a tracked lockfile or generated source unexpectedly, reject that sequence and choose a repository-supported clean alternative; do not normalize a dirty worktree as successful setup.
+Use the applicable Superpowers design or planning workflow at a depth proportionate to the change. Once the user approves a design interactively, faithfully writing and self-reviewing its temporary artifacts and proceeding with implementation does not require a second approval. Ask again only if new evidence materially diverges from the approved scope, behavior, architecture, risk, acceptance criteria, or external actions.
 
-## Worktree policy
+### Implement and validate
 
-Implementation work must be isolated by default.
+Work in the isolated checkout. Follow the profile's ordered bootstrap and validation entries plus repository-provided checks. Read [references/project-guidance.md](references/project-guidance.md) before setup or validation; it defines runtime selection, clean bootstrap, dependency-tree safety, generated artifacts, sandbox preflight, long-running processes, and durable profile updates.
 
-- If the current directory is already a clean, task-specific worktree, reuse it.
-- Otherwise invoke Superpowers’ `using-git-worktrees` workflow before modifying project files. When no native harness-managed worktree is available, create the manual worktree at `<primary-checkout>/.worktrees/<task-slug>` after verifying `.worktrees/` is ignored.
-- When composing with an isolation workflow, use only its environment-detection and workspace-isolation steps; the Omakase profile owns project setup and validation. Do not execute the isolation workflow's generic project-setup or baseline-verification steps. Resolve or generate the profile, then select commands through Omakase. Never run both paths.
-- Never nest worktrees.
-- Do not move, delete, reset, or clean unrelated worktrees.
-- Read-only intake and diagnosis may happen before worktree creation; implementation may not.
-- Preserve a task worktree while its pull request remains open. After a merge, remove only an Omakase-created worktree that is clean and has the expected identity; delete its local task branch only after successful removal. Remote branch deletion still requires explicit authorization.
+Do not block independent discovery, design, or review behind a long baseline when they can proceed safely without mutating its inputs. Inspect the diff and run applicable validation yourself; an agent's “done” is not evidence. Report exact commands and outcomes.
 
-## Delivery workflow
+### Review and publish
 
-### 1. Understand and plan
+Review the completed diff against the task and use the applicable review and branch-finishing skills. When publication is authorized, follow the resolved convention for each artifact, preserve the pull-request template, commit only task changes, push, create or update the pull request, and read the resulting commit and PR state back. Do not merge a protected branch without explicit user or repository authorization.
 
-Use the relevant Superpowers workflow. Match planning depth to the task: do not inflate a bounded change into a product-design exercise, but do not skip required design or planning gates for substantial work.
+### Follow CI and review
 
-Once the user approves a design through interactive back-and-forth, faithfully writing and self-reviewing the design spec, creating the implementation plan, and proceeding with the authorized implementation does not require a second approval. Ask again only when the written artifact or new evidence materially diverges from the approved scope, behavior, architecture, risk, acceptance criteria, or external actions.
+Inspect required checks after publication. If pending, schedule a follow-up in the current Codex task carrying the repository and PR URL, branch and worktree, pending checks, completed validation, and next permitted action. Stop it when checks resolve, the PR closes or merges, or attention is required.
 
-### 2. Implement and validate
-
-Implement in the task worktree. When the worktree is not ready, run every profile `bootstrap.steps` entry in order. Select the configured runtime for each bootstrap or validation entry; never apply one textual runtime prefix to an entire mixed-runtime process tree. Follow the runtime-resolution rules in [references/project-guidance.md](references/project-guidance.md). Run profile validation entries in their listed order. Treat full validation as self-preparing: do not skip an earlier generator or preparation entry because dependencies are installed, bootstrap ran previously, or Git reports a clean checkout. Use the profile's validation commands alongside project-provided commands and repository conventions. Apply TDD, systematic debugging, and verification as required by the corresponding Superpowers skills.
-
-Before the first dependency-tree mutation, inspect the install command and known execution constraints without touching the tree. Confirm that package-manager cache and log directories are writable; otherwise select task-scoped directories under the system temporary directory up front. If the clean install is known to require unavailable sandbox network access, request the required execution context before starting it. Combine all known environmental requirements into one correctly configured attempt. Do not run a knowingly doomed installer merely to collect its expected errors, and do not assume network access is required when local artifacts may suffice.
-
-Do not serialize independent preparation behind a long full-suite baseline. When useful, start a background baseline asynchronously, retain its live process, and continue non-dependent discovery, design, specification, planning, or review. Do not modify files, dependencies, generated artifacts, or configuration consumed by that running check. A focused relevant baseline may gate the first implementation edit; full validation must run again after implementation.
-
-Before each expensive validation command, inspect the command, profile notes, and known execution constraints. If repository evidence or a verified prior run shows that it requires localhost sockets, browser processes, external services, or network access unavailable in the default sandbox, request the correct execution context on the first run. Do not spend a full-suite failure rediscovering a stable constraint, and do not request broader access based only on speculation.
-
-Treat mutation of one dependency tree as an exclusive operation. While an installer is active, do not start another installer, test, build, or commit hook that consumes or mutates that tree. If installation fails or is interrupted after touching the tree, wait for the installer to exit, treat the tree as untrusted, and use the repository's clean deterministic bootstrap command before running consumers.
-
-When a long-running setup command yields a live process or session, retain and monitor that same process. Retry only after confirming it exited or failed; lack of recent output alone is not evidence of failure.
-
-If an unexpected sandbox restriction still causes a dependency tool to fail, correct the execution context before the clean recovery attempt. Do not change repository configuration, ownership of the user's cache, or the project profile for this harness-specific condition.
-
-Do not accept an agent statement such as “done” as evidence. Inspect the diff and run the applicable validation commands. Report exact commands and outcomes.
-
-### 3. Review and publish
-
-Review the completed diff against the original task. Use Superpowers’ review and branch-finishing workflows where applicable.
-
-When publication is authorized:
-
-- preserve the resolved repository conventions for each Git and GitHub artifact;
-- preserve the repository’s PR template and fill it from known evidence;
-- commit only task-related changes;
-- push the task branch;
-- create or update the pull request;
-- read the resulting commit and PR state back before claiming publication succeeded.
-
-Do not merge a protected branch unless the user or established repository policy explicitly authorizes it.
-
-### 4. Follow CI
-
-Inspect required checks immediately after publication.
-
-If checks are pending, create a scheduled follow-up in the current Codex task. The follow-up must retain or restate:
-
-- repository and pull-request URL;
-- task branch and worktree path;
-- pending checks;
-- validation already completed;
-- the next permitted action.
-
-Use a practical cadence based on expected CI duration. Avoid permanent polling: stop the schedule when checks resolve, the PR merges or closes, or attention is required.
-
-If CI fails:
-
-1. Gather the failing check, logs, annotations, and relevant commit state.
-2. Use systematic debugging to identify the root cause.
-3. Repair clear in-scope failures in the same worktree without asking for a redundant yes/no confirmation.
-4. Repeat appropriate local validation and completion verification.
-5. Push the repair and resume scheduled follow-up.
-
-Ask before expanding scope, changing product behavior, weakening tests or CI, modifying secrets or infrastructure, or taking an action that needs new authority.
-
-### 5. Follow review feedback
-
-When review feedback arrives:
-
-1. Fetch the full actionable context, not only a notification summary.
-2. Use Superpowers’ `receiving-code-review` discipline to evaluate technical validity.
-3. Implement clear, in-scope requests; validate, push, and resume CI monitoring.
-4. Do not automatically treat general discussion, preferences, or conflicting requests as coding instructions.
-
-Escalate conflicting or materially ambiguous feedback with a concise explanation and recommendation.
-
-## Attention policy
-
-Do not ask the user to confirm safe, expected actions already authorized by the delivery request. Continue through routine editing, testing, validation, and follow-up when permissions allow.
-
-Request attention for:
-
-- unresolved product or acceptance ambiguity;
-- conflicting task, repository, or review requirements;
-- credentials, permissions, or unavailable integrations;
-- destructive, irreversible, security-sensitive, or materially broader actions;
-- an unexpected failure for which the next repair would be speculative;
-- a merge or release decision not covered by existing authorization.
-
-Every attention request must state:
-
-1. what was discovered;
-2. why progress cannot safely continue;
-3. the smallest decision or authority needed;
-4. the recommended option.
+For CI failures, gather logs and commit state, debug the root cause, repair clear in-scope failures in the same worktree, validate, push, and resume monitoring. For review feedback, fetch the full context, apply `superpowers:receiving-code-review`, implement clear in-scope requests, validate, push, and resume monitoring. Escalate conflicting or materially ambiguous feedback.
 
 ## Completion
 
-Do not impose a custom turn, repair, or token budget. Let the coding harness enforce its own limits.
-
-By default, a delivered change is complete when:
-
-- implementation is isolated from unrelated work;
-- the diff satisfies the task;
-- applicable local validation passes;
-- the branch is published and a PR exists when appropriate;
-- required CI is green;
-- unresolved review feedback is absent;
-- the user has been told whether the PR is ready, merged, or waiting on an explicitly identified decision.
-
-If merge is external, continue monitoring only when a scheduled follow-up is useful and authorized. Stop obsolete schedules promptly.
+Do not invent turn, repair, or token budgets. A delivered change is complete when the isolated diff satisfies the task, applicable local validation passes, publication exists when appropriate, required CI is green, actionable review feedback is resolved, and the user knows whether the PR is ready, merged, or awaiting a specific decision. Continue monitoring external merge state only when a scheduled follow-up is useful and authorized.
