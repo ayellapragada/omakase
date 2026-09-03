@@ -85,7 +85,7 @@ Run that script from this skill's directory, or invoke it by its absolute instal
 - Ask before inventing novel shell setup, obtaining secrets, changing infrastructure, weakening checks, or performing destructive operations. Store secret file paths or prerequisite names only, never secret values.
 - Tell the user when a profile is first generated or materially changed, but do not require approval for a safe evidence-backed initial profile.
 
-Treat the profile as living memory. When worktree setup exposes a problem, diagnose it first. Update the profile only when the fix is durable and reproducible across future worktrees, rerun the affected setup or validation, and retain the change only after it works. Do not encode transient outages, sandbox failures, or speculative workarounds.
+Treat the profile as living memory. When worktree setup exposes a problem, diagnose it first. Update the profile only when the fix is durable and reproducible across future worktrees, rerun the affected setup or validation, and retain the change only after it works. Do not encode transient outages, one-off sandbox failures, or speculative workarounds; a stable harness constraint belongs in `worktree.notes` only after a successful verification identifies the required execution context.
 
 A verified bootstrap must leave tracked project files unchanged. Check `git status` after running candidate steps. If setup rewrites a tracked lockfile or generated source unexpectedly, reject that sequence and choose a repository-supported clean alternative; do not normalize a dirty worktree as successful setup.
 
@@ -95,6 +95,7 @@ Implementation work must be isolated by default.
 
 - If the current directory is already a clean, task-specific worktree, reuse it.
 - Otherwise invoke Superpowers’ `using-git-worktrees` workflow before modifying project files. When no native harness-managed worktree is available, create the manual worktree at `<primary-checkout>/.worktrees/<task-slug>` after verifying `.worktrees/` is ignored.
+- When composing with an isolation workflow, use only its environment-detection and workspace-isolation steps; the Omakase profile owns project setup and validation. Do not execute the isolation workflow's generic project-setup or baseline-verification steps. Resolve or generate the profile, then select commands through Omakase. Never run both paths.
 - Never nest worktrees.
 - Do not move, delete, reset, or clean unrelated worktrees.
 - Read-only intake and diagnosis may happen before worktree creation; implementation may not.
@@ -112,13 +113,17 @@ Once the user approves a design through interactive back-and-forth, faithfully w
 
 Implement in the task worktree. When the worktree is not ready, run every profile `bootstrap.steps` entry in order. Select the configured runtime for each bootstrap or validation entry; never apply one textual runtime prefix to an entire mixed-runtime process tree. Follow the runtime-resolution rules in [references/project-guidance.md](references/project-guidance.md). Run profile validation entries in their listed order. Treat full validation as self-preparing: do not skip an earlier generator or preparation entry because dependencies are installed, bootstrap ran previously, or Git reports a clean checkout. Use the profile's validation commands alongside project-provided commands and repository conventions. Apply TDD, systematic debugging, and verification as required by the corresponding Superpowers skills.
 
+Before the first dependency-tree mutation, inspect the install command and known execution constraints without touching the tree. Confirm that package-manager cache and log directories are writable; otherwise select task-scoped directories under the system temporary directory up front. If the clean install is known to require unavailable sandbox network access, request the required execution context before starting it. Combine all known environmental requirements into one correctly configured attempt. Do not run a knowingly doomed installer merely to collect its expected errors, and do not assume network access is required when local artifacts may suffice.
+
 Do not serialize independent preparation behind a long full-suite baseline. When useful, start a background baseline asynchronously, retain its live process, and continue non-dependent discovery, design, specification, planning, or review. Do not modify files, dependencies, generated artifacts, or configuration consumed by that running check. A focused relevant baseline may gate the first implementation edit; full validation must run again after implementation.
+
+Before each expensive validation command, inspect the command, profile notes, and known execution constraints. If repository evidence or a verified prior run shows that it requires localhost sockets, browser processes, external services, or network access unavailable in the default sandbox, request the correct execution context on the first run. Do not spend a full-suite failure rediscovering a stable constraint, and do not request broader access based only on speculation.
 
 Treat mutation of one dependency tree as an exclusive operation. While an installer is active, do not start another installer, test, build, or commit hook that consumes or mutates that tree. If installation fails or is interrupted after touching the tree, wait for the installer to exit, treat the tree as untrusted, and use the repository's clean deterministic bootstrap command before running consumers.
 
 When a long-running setup command yields a live process or session, retain and monitor that same process. Retry only after confirming it exited or failed; lack of recent output alone is not evidence of failure.
 
-If a dependency tool fails only because its default cache or log directory is outside the writable sandbox, retry with a task-scoped cache under the system temporary directory. Do not change repository configuration, ownership of the user's cache, or the project profile for this harness-specific condition.
+If an unexpected sandbox restriction still causes a dependency tool to fail, correct the execution context before the clean recovery attempt. Do not change repository configuration, ownership of the user's cache, or the project profile for this harness-specific condition.
 
 Do not accept an agent statement such as “done” as evidence. Inspect the diff and run the applicable validation commands. Report exact commands and outcomes.
 

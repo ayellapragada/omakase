@@ -44,6 +44,8 @@ Unknown fields should be ignored rather than treated as fatal so the profile can
 
 Run `bootstrap.steps` sequentially and stop at the first failure. Validation entries use the same `{runtime, run}` shape. `runtime` identifies the tool family needed for that one command; it is not a shell prefix.
 
+Align bootstrap steps with failure and retry boundaries when the repository provides evidence for doing so. If repository-supported phase-specific commands or flags expose dependency installation, database preparation, or generation as independently repeatable phases, record those phases as separate ordered steps. After repairing a failure, resume at the failed profile step rather than rerunning earlier successful expensive steps. Do not decompose a canonical entry point into invented shell setup; when the repository supports only one setup command and a failed mutation leaves state untrusted, rerun that clean command.
+
 Make `validation.full` self-preparing. When a check consumes ignored generated artifacts, record the repository-supported generator as an earlier validation entry even if bootstrap also runs it. Mirror generators that CI or production builds run before the same checks. A clean Git status does not prove that ignored artifacts are current.
 
 For an asdf-managed project, resolve only the executable needed by the current step:
@@ -54,15 +56,16 @@ For an asdf-managed project, resolve only the executable needed by the current s
 
 A command that is merely quiet may still be working; retain its live session and inspect its eventual exit before retrying. Dependency installation is an exclusive operation for that dependency tree: do not overlap it with another installer or a test, build, or hook that consumes the same tree. If an install fails or is interrupted after mutation, treat the tree as untrusted. Once the process has exited, recover with the repository's clean deterministic install or bootstrap command rather than layering an incremental install over partial state.
 
-If the sandbox denies a dependency manager's user-level cache, use a task-scoped cache under the system temporary directory for that execution. Treat this as execution-environment handling, not project knowledge.
+Before a dependency installer mutates its tree, check known harness constraints that can be established locally. If the dependency manager's user-level cache or log directory is not writable, use task-scoped directories under the system temporary directory on the first attempt. If the installer is known to require registry access unavailable in the sandbox, obtain the required execution context before starting it. Combine known constraints into one attempt and treat them as execution-environment handling, not project knowledge.
 
 ## Learning loop
 
 Do not update the profile merely because a command failed. First classify the cause:
 
 - Durable and reproducible: wrong runtime selection, a consistently required bootstrap step, a required local file path, or a stable validation command. Fix, rerun, then persist the learning.
+- Stable harness constraint: a fixed command repeatably needs a specific execution context, such as localhost socket permission. After a successful verification, record a concise, non-secret note in `worktree.notes` so the next task can preflight it.
 - Dirty bootstrap: a setup command succeeds but rewrites a tracked lockfile or generated source. Prefer a repository-supported clean alternative and verify it leaves tracked files unchanged before persisting it.
-- Transient: network outage, registry hiccup, temporary CI incident, or one-time cache corruption. Recover if possible, but do not memorialize it.
+- Transient: network outage, registry hiccup, temporary CI incident, one-time cache corruption, or a one-off sandbox denial. Recover if possible, but do not memorialize it.
 - Unsafe or uncertain: secret acquisition, novel host mutation, infrastructure changes, or a speculative workaround. Ask for the smallest required decision before proceeding.
 
 Keep the file concise. Delete stale instructions when repository automation makes them unnecessary.
