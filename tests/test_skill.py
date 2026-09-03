@@ -114,6 +114,51 @@ class OmakaseSkillContractTest(unittest.TestCase):
         self.assertIn("untrusted", guidance)
         self.assertIn("clean deterministic", guidance)
 
+    def test_skill_avoids_predictable_bootstrap_retries(self):
+        text = SKILL.read_text()
+        guidance = PROJECT_GUIDANCE.read_text()
+
+        required_skill_fragments = (
+            "profile owns project setup and validation",
+            "use only its environment-detection and workspace-isolation steps",
+            "Do not execute the isolation workflow's generic project-setup or baseline-verification steps",
+            "Before the first dependency-tree mutation",
+            "cache and log directories are writable",
+            "known to require unavailable sandbox network access",
+            "one correctly configured attempt",
+        )
+        for fragment in required_skill_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, text)
+
+        required_guidance_fragments = (
+            "failure and retry boundaries",
+            "repository-supported phase-specific commands or flags",
+            "Do not decompose a canonical entry point into invented shell setup",
+            "resume at the failed profile step",
+        )
+        for fragment in required_guidance_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, guidance)
+
+    def test_skill_preflights_expensive_validation_execution_context(self):
+        text = SKILL.read_text()
+        guidance = PROJECT_GUIDANCE.read_text()
+
+        required_skill_fragments = (
+            "Before each expensive validation command",
+            "localhost sockets, browser processes, external services, or network access",
+            "correct execution context on the first run",
+        )
+        for fragment in required_skill_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, text)
+
+        self.assertIn("Stable harness constraint", guidance)
+        self.assertIn("worktree.notes", guidance)
+        self.assertIn("one-off sandbox denial", guidance)
+        self.assertIn("Do not encode transient outages, one-off sandbox failures", text)
+
     def test_full_validation_prepares_ignored_generated_artifacts(self):
         text = SKILL.read_text()
         guidance = PROJECT_GUIDANCE.read_text()
