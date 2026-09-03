@@ -78,6 +78,30 @@ class OmakaseSkillContractTest(unittest.TestCase):
         self.assertIn("continue non-dependent", text)
         self.assertIn("background baseline", text)
 
+    def test_skill_defaults_to_a_lean_cost_aware_review_cycle(self):
+        text = SKILL.read_text()
+        metadata = METADATA.read_text()
+
+        required_fragments = (
+            "Lean review by default",
+            "Implement directly in the main agent",
+            "For every project change intended to land, request one independent review",
+            "at most one scoped re-review, and only when material findings required fixes",
+            "Do not invoke `superpowers:subagent-driven-development` merely because a plan can be split into tasks",
+            "user requests an exhaustive workflow",
+            "repository policy requires it",
+            "scale and risk justify the additional model consumption",
+            "For every subagent dispatch, set both the model and reasoning effort explicitly",
+            "cheapest capable tier for mechanical work",
+            "balanced mid-tier for implementation from prose or ordinary review",
+            "most capable tier",
+        )
+        for fragment in required_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, text)
+
+        self.assertIn("lean review cycle", metadata)
+
     def test_skill_uses_predictable_worktrees_and_exclusive_bootstrap(self):
         text = SKILL.read_text()
         guidance = PROJECT_GUIDANCE.read_text()
