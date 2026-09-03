@@ -44,6 +44,8 @@ Unknown fields should be ignored rather than treated as fatal so the profile can
 
 Run `bootstrap.steps` sequentially and stop at the first failure. Validation entries use the same `{runtime, run}` shape. `runtime` identifies the tool family needed for that one command; it is not a shell prefix.
 
+Make `validation.full` self-preparing. When a check consumes ignored generated artifacts, record the repository-supported generator as an earlier validation entry even if bootstrap also runs it. Mirror generators that CI or production builds run before the same checks. A clean Git status does not prove that ignored artifacts are current.
+
 For an asdf-managed project, resolve only the executable needed by the current step:
 
 - `runtime: ruby`: resolve the configured Ruby. Invoke repository Ruby binstubs with that Ruby. Invoke Bundler's executable through the same Ruby interpreter.
