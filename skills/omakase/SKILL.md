@@ -40,6 +40,20 @@ Omakase is the conductor. Do not restate or weaken the detailed workflows owned 
 
 The separately installed `gh-fix-ci` skill can be used when the user invokes it or when its approval-oriented workflow is appropriate. Do not make it a mandatory Omakase dependency.
 
+## Review intensity and model routing
+
+### Lean review by default
+
+Keep ordinary delivery in one implementation context, with independent review at the point where it has the most leverage:
+
+1. Implement directly in the main agent, following the applicable design, TDD, debugging, and verification disciplines.
+2. Run focused validation while developing and the applicable full validation before publication.
+3. For every project change intended to land, request one independent review of the completed diff. Fix valid material findings and rerun affected validation. Request at most one scoped re-review, and only when material findings required fixes.
+
+Do not invoke `superpowers:subagent-driven-development` merely because a plan can be split into tasks. Use its implementer-per-task and reviewer-per-task cycle only when the user requests an exhaustive workflow, repository policy requires it, or the change's scale and risk justify the additional model consumption. Examples include security-sensitive behavior, data migrations, subtle concurrency, or several genuinely independent implementation domains.
+
+For every subagent dispatch, set both the model and reasoning effort explicitly. Use the cheapest capable tier for mechanical work with complete requirements and a balanced mid-tier for implementation from prose or ordinary review. Reserve the most capable tier for architecture, security, concurrency, difficult debugging, or a consequential final review. Never allow an omitted routing choice to inherit an expensive main-session default accidentally.
+
 ## Intake
 
 Before changing files:
