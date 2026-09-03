@@ -10,6 +10,9 @@ METADATA = ROOT / "skills" / "omakase" / "agents" / "openai.yaml"
 PROJECT_GUIDANCE = (
     ROOT / "skills" / "omakase" / "references" / "project-guidance.md"
 )
+REPOSITORY_CONVENTIONS = (
+    ROOT / "skills" / "omakase" / "references" / "repository-conventions.md"
+)
 PROFILE_TEMPLATE = (
     ROOT / "skills" / "omakase" / "assets" / "omakase.local.example.yml"
 )
@@ -110,6 +113,38 @@ class OmakaseSkillContractTest(unittest.TestCase):
         self.assertIn("exclusive operation", text)
         self.assertIn("untrusted", guidance)
         self.assertIn("clean deterministic", guidance)
+
+    def test_skill_discovers_and_preserves_repository_conventions(self):
+        text = SKILL.read_text()
+        guidance = REPOSITORY_CONVENTIONS.read_text()
+
+        required_skill_fragments = (
+            "references/repository-conventions.md",
+            "before naming a branch or composing a commit or pull request",
+            "artifact-specific",
+            "Do not assume that a commit-message convention also applies to pull-request titles",
+        )
+        for fragment in required_skill_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, text)
+
+        required_guidance_fragments = (
+            "# Repository conventions",
+            "Explicit policy",
+            "Recent accepted examples",
+            "human-authored",
+            "mixed or weak",
+            "Branch names",
+            "Commit subjects",
+            "Pull-request titles",
+            "Pull-request bodies",
+            "Review replies",
+            "required platform prefix",
+            "read the created or updated artifact back",
+        )
+        for fragment in required_guidance_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, guidance)
 
 
 if __name__ == "__main__":

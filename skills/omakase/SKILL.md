@@ -61,8 +61,11 @@ Before changing files:
 1. Resolve the task source and definition of done.
 2. Resolve the target repository. For a multi-repository scope, inspect only enough repositories to identify the relevant set.
 3. Read applicable instructions and resolve the personal project profile described in [references/project-guidance.md](references/project-guidance.md).
-4. Inspect git status and preserve unrelated user changes.
-5. Ask a question only when the answer is genuinely blocking or would materially change the result.
+4. Resolve the repository's writing and naming conventions as described in [references/repository-conventions.md](references/repository-conventions.md) before naming a branch or composing a commit or pull request.
+5. Inspect git status and preserve unrelated user changes.
+6. Ask a question only when the answer is genuinely blocking or would materially change the result.
+
+Treat conventions as artifact-specific. Branch names, commit subjects and bodies, pull-request titles and bodies, release notes, and review replies may deliberately use different styles. Do not assume that a commit-message convention also applies to pull-request titles. Explicit instructions and templates win; otherwise infer only a stable pattern from recent representative examples. When evidence is mixed or weak, use a clear neutral style instead of inventing a repository rule.
 
 ### Personal project profile
 
@@ -125,12 +128,12 @@ Review the completed diff against the original task. Use Superpowers’ review a
 
 When publication is authorized:
 
-- preserve repository branch and commit conventions;
+- preserve the resolved repository conventions for each Git and GitHub artifact;
 - preserve the repository’s PR template and fill it from known evidence;
 - commit only task-related changes;
 - push the task branch;
 - create or update the pull request;
-- read the resulting PR state back before claiming publication succeeded.
+- read the resulting commit and PR state back before claiming publication succeeded.
 
 Do not merge a protected branch unless the user or established repository policy explicitly authorizes it.
 
