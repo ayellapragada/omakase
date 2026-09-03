@@ -1,0 +1,92 @@
+from pathlib import Path
+import unittest
+
+import yaml
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SKILL = ROOT / "skills" / "omakase" / "SKILL.md"
+METADATA = ROOT / "skills" / "omakase" / "agents" / "openai.yaml"
+PROJECT_GUIDANCE = (
+    ROOT / "skills" / "omakase" / "references" / "project-guidance.md"
+)
+PROFILE_TEMPLATE = (
+    ROOT / "skills" / "omakase" / "assets" / "omakase.local.example.yml"
+)
+PROFILE_RESOLVER = ROOT / "skills" / "omakase" / "scripts" / "profile_path.py"
+
+
+class OmakaseSkillContractTest(unittest.TestCase):
+    def test_skill_encodes_the_conductor_contract(self):
+        text = SKILL.read_text()
+
+        required_fragments = (
+            "name: omakase",
+            "Hybrid trigger",
+            "Do not trigger",
+            "one-off",
+            "diagnosis",
+            "worktree",
+            "Superpowers",
+            "GitHub",
+            "repository-approved integrations",
+            "scheduled follow-up",
+            "CI",
+            "review feedback",
+            "Attention policy",
+            "Completion",
+            "references/project-guidance.md",
+            ".omakase.local.yml",
+            "scripts/profile_path.py",
+            "primary checkout",
+            "durable and reproducible",
+        )
+        for fragment in required_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, text)
+
+    def test_skill_has_desktop_metadata_and_project_profile_resources(self):
+        metadata = METADATA.read_text()
+        guidance = PROJECT_GUIDANCE.read_text()
+
+        self.assertIn('display_name: "Omakase"', metadata)
+        self.assertIn("default_prompt:", metadata)
+        self.assertIn("# Personal project profile", guidance)
+        self.assertIn("globally ignored", guidance)
+        self.assertIn("established repository entry points", guidance)
+        self.assertTrue(PROFILE_TEMPLATE.is_file())
+        self.assertTrue(PROFILE_RESOLVER.is_file())
+
+    def test_profile_template_selects_runtime_per_bootstrap_step(self):
+        profile = yaml.safe_load(PROFILE_TEMPLATE.read_text())
+
+        self.assertNotIn("runtime", profile)
+        self.assertEqual(
+            profile["bootstrap"]["steps"],
+            [{"runtime": None, "run": None}],
+        )
+        self.assertEqual(
+            profile["validation"]["quick"],
+            [{"runtime": None, "run": None}],
+        )
+
+    def test_skill_avoids_redundant_approval_and_serial_waits(self):
+        text = SKILL.read_text()
+
+        self.assertIn("does not require a second approval", text)
+        self.assertIn("materially diverges", text)
+        self.assertIn("continue non-dependent", text)
+        self.assertIn("background baseline", text)
+
+    def test_skill_uses_predictable_worktrees_and_exclusive_bootstrap(self):
+        text = SKILL.read_text()
+        guidance = PROJECT_GUIDANCE.read_text()
+
+        self.assertIn("<primary-checkout>/.worktrees/<task-slug>", text)
+        self.assertIn("exclusive operation", text)
+        self.assertIn("untrusted", guidance)
+        self.assertIn("clean deterministic", guidance)
+
+
+if __name__ == "__main__":
+    unittest.main()

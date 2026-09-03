@@ -1,0 +1,5 @@
+interface:
+  display_name: "Omakase"
+  short_description: "Carry project changes through PR, CI, and review"
+  default_prompt: "Take this project change from intake through isolated implementation, validation, pull request, CI, and review follow-up. Ask only when a material decision or new authority is required."
+

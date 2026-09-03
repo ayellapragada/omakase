@@ -1,0 +1,27 @@
+# Personal, machine-local delivery knowledge. Never commit this file.
+version: 1
+
+bootstrap:
+  # Ordered, idempotent steps required in every fresh worktree.
+  steps:
+    - runtime:
+      run:
+
+validation:
+  quick:
+    - runtime:
+      run:
+  full: []
+
+worktree:
+  # Record paths only. Never put secret values in this file.
+  required_local_files: []
+  notes: []
+
+ci:
+  provider:
+  required_checks: auto
+
+publication:
+  base_branch:
+  merge: manual
