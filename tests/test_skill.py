@@ -114,6 +114,14 @@ class OmakaseSkillContractTest(unittest.TestCase):
         self.assertIn("untrusted", guidance)
         self.assertIn("clean deterministic", guidance)
 
+    def test_full_validation_prepares_ignored_generated_artifacts(self):
+        text = SKILL.read_text()
+        guidance = PROJECT_GUIDANCE.read_text()
+
+        self.assertIn("full validation as self-preparing", text)
+        self.assertIn("ignored generated artifacts", guidance)
+        self.assertIn("A clean Git status does not prove", guidance)
+
     def test_skill_discovers_and_preserves_repository_conventions(self):
         text = SKILL.read_text()
         guidance = REPOSITORY_CONVENTIONS.read_text()
