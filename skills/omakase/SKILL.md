@@ -81,7 +81,9 @@ On the default publication path, follow the resolved convention for each artifac
 
 ### Follow CI and review
 
-Inspect required checks after publication. If pending, schedule a follow-up in the current Codex task carrying the repository and PR URL, branch and worktree, pending checks, completed validation, and next permitted action. Stop it when checks resolve, the PR closes or merges, or attention is required.
+Whenever assessing GitHub status, read the current PR state, draft status, mergeability and merge-state, required checks, and review decision. Refresh all of them after changing its base branch or making another PR mutation. Say a PR is ready to merge only when it is open and non-draft, required checks are green, GitHub reports no merge conflicts or policy blockers, and no requested changes or required reviews are outstanding. Treat unknown mergeability as pending rather than ready. Report blockers precisely and continue follow-up or request attention as appropriate.
+
+If required checks or mergeability are pending, schedule a follow-up in the current Codex task carrying the repository and PR URL, branch and worktree, pending conditions, completed validation, and next permitted action. Concrete blockers such as conflicts, failed checks, draft status, or unsatisfied review requirements must be reported and handled or escalated as appropriate. Stop follow-up when the PR becomes ready, closes or merges, or attention is required.
 
 For CI failures, gather logs and commit state, debug the root cause, repair clear in-scope failures in the same worktree, validate, push, and resume monitoring. For review feedback, fetch the full context, apply `superpowers:receiving-code-review`, implement clear in-scope requests, validate, push, and resume monitoring. Escalate conflicting or materially ambiguous feedback.
 

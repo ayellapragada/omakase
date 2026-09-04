@@ -82,6 +82,25 @@ class OmakaseSkillContractTest(unittest.TestCase):
             ),
         )
 
+    def test_pr_readiness_requires_more_than_green_checks(self):
+        text = SKILL.read_text()
+
+        self.assert_contains_all(
+            text,
+            (
+                "current PR state",
+                "draft status",
+                "mergeability and merge-state",
+                "review decision",
+                "after changing its base branch",
+                "required checks are green",
+                "no merge conflicts or policy blockers",
+                "no requested changes or required reviews are outstanding",
+                "Concrete blockers",
+                "Report blockers",
+            ),
+        )
+
     def test_profile_resources_and_metadata_are_present(self):
         metadata = METADATA.read_text()
         guidance = PROJECT_GUIDANCE.read_text()
