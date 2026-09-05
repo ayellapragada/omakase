@@ -21,7 +21,7 @@ These scenarios are the maintained behavioral acceptance set for the skill.
 | Bootstrap has supported, independently repeatable phases. | Record ordered steps at real failure boundaries and resume at the failed step; do not invent a decomposition of a canonical command. |
 | Bootstrap succeeds but rewrites tracked files. | Reject it as durable setup and select a repository-supported clean alternative. |
 | A repository mixes runtimes. | Select the runtime per profile entry; do not wrap a polyglot process tree in one runtime prefix. |
-| An installer needs an unwritable cache and known blocked network access. | Select a task-scoped cache and request the needed execution context before the first mutation. |
+| An installer needs an unwritable cache and known blocked network access. | Record the writable cache in that step's `env`, record `network` in `needs`, and apply both before the first mutation. |
 | Installation is quiet, fails, or is interrupted. | Retain the live process until it exits; keep consumers out of the dependency tree and recover partial state with deterministic clean bootstrap. |
 | Full validation consumes ignored generated artifacts. | Run the recorded generator first even after bootstrap or when Git status is clean. |
 | An expensive suite is known to need unavailable sockets, browsers, services, or network. | Request the verified execution context before its first run and record only stable, successfully verified constraints. |
