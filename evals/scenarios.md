@@ -14,6 +14,7 @@ These scenarios are the maintained behavioral acceptance set for the skill.
 | Work begins in a primary checkout without native isolation. | Create `<primary-checkout>/.worktrees/<task-slug>` after verifying it is ignored. |
 | A design has been approved interactively. | Write and self-review any required temporary artifacts, then proceed without seeking duplicate approval unless the result materially diverges. |
 | A long baseline can run alongside non-mutating work. | Retain it asynchronously while continuing independent discovery, design, planning, or review; rerun full validation after implementation. |
+| An open PR changes only prose documentation or agent guidance with no runtime effect. | Review the diff and run only applicable documentation checks; skip runtime tests and builds, use any documented skip-CI convention, and do not wait for intentionally skipped CI. |
 | A repository has no `.omakase.local.yml`. | Generate the smallest evidence-backed, globally ignored profile in the primary checkout; validate it in isolation and report what was learned. |
 | A linked worktree’s primary checkout has a profile. | Resolve and use the shared profile rather than creating a copy. |
 | The isolation workflow offers setup and baseline commands. | Use only its isolation steps; let the profile own setup and validation. |
