@@ -93,11 +93,27 @@ class OmakaseSkillContractTest(unittest.TestCase):
                 "mergeability and merge-state",
                 "review decision",
                 "after changing its base branch",
-                "required checks are green",
+                "required checks are green or intentionally skipped under repository policy",
                 "no merge conflicts or policy blockers",
                 "no requested changes or required reviews are outstanding",
                 "Concrete blockers",
                 "Report blockers",
+            ),
+        )
+
+    def test_validation_is_proportional_to_change_risk(self):
+        text = SKILL.read_text()
+
+        self.assert_contains_all(
+            text,
+            (
+                "Classify the completed diff before choosing validation",
+                "documentation-only",
+                "cannot affect runtime behavior",
+                "skip runtime tests, builds, and CI waiting",
+                "documentation-focused checks",
+                "workflows, executable configuration, dependencies, schemas, migrations, generated files, or assets",
+                "skip-CI convention",
             ),
         )
 

@@ -71,6 +71,8 @@ Use the applicable Superpowers design or planning workflow at a depth proportion
 
 Work in the isolated checkout. Follow the profile's ordered bootstrap and validation entries plus repository-provided checks. Read [references/project-guidance.md](references/project-guidance.md) before setup or validation; it defines runtime selection, clean bootstrap, dependency-tree safety, generated artifacts, sandbox preflight, long-running processes, and durable profile updates.
 
+Classify the completed diff before choosing validation. A documentation-only change means every changed file is prose documentation or agent guidance and cannot affect runtime behavior. For such a diff, run the documentation-focused checks that apply—diff review, formatting, links, or skill validation—and skip runtime tests, builds, and CI waiting. Do not classify changes to workflows, executable configuration, dependencies, schemas, migrations, generated files, or assets as documentation-only. Use the repository's documented skip-CI convention when one applies.
+
 Do not block independent discovery, design, or review behind a long baseline when they can proceed safely without mutating its inputs. Inspect the diff and run applicable validation yourself; an agent's “done” is not evidence. Report exact commands and outcomes.
 
 ### Review and publish
@@ -81,7 +83,9 @@ On the default publication path, follow the resolved convention for each artifac
 
 ### Follow CI and review
 
-Whenever assessing GitHub status, read the current PR state, draft status, mergeability and merge-state, required checks, and review decision. Refresh all of them after changing its base branch or making another PR mutation. Say a PR is ready to merge only when it is open and non-draft, required checks are green, GitHub reports no merge conflicts or policy blockers, and no requested changes or required reviews are outstanding. Treat unknown mergeability as pending rather than ready. Report blockers precisely and continue follow-up or request attention as appropriate.
+Whenever assessing GitHub status, read the current PR state, draft status, mergeability and merge-state, required checks, and review decision. Refresh all of them after changing its base branch or making another PR mutation. Say a PR is ready to merge only when it is open and non-draft, required checks are green or intentionally skipped under repository policy, GitHub reports no merge conflicts or policy blockers, and no requested changes or required reviews are outstanding. Treat unknown mergeability as pending rather than ready. Report blockers precisely and continue follow-up or request attention as appropriate.
+
+When a documentation-only change validly uses a skip-CI convention, confirm the published artifact and current PR state once; do not wait for or schedule CI that was intentionally skipped.
 
 If required checks or mergeability are pending, schedule a follow-up in the current Codex task carrying the repository and PR URL, branch and worktree, pending conditions, completed validation, and next permitted action. Concrete blockers such as conflicts, failed checks, draft status, or unsatisfied review requirements must be reported and handled or escalated as appropriate. Stop follow-up when the PR becomes ready, closes or merges, or attention is required.
 
@@ -89,4 +93,4 @@ For CI failures, gather logs and commit state, debug the root cause, repair clea
 
 ## Completion
 
-Do not invent turn, repair, or token budgets. A delivered change is complete when the isolated diff satisfies the task, applicable local validation passes, publication exists when appropriate, required CI is green, actionable review feedback is resolved, and the user knows whether the PR is ready, merged, or awaiting a specific decision. Continue monitoring external merge state only when a scheduled follow-up is useful and authorized.
+Do not invent turn, repair, or token budgets. A delivered change is complete when the isolated diff satisfies the task, applicable local validation passes, publication exists when appropriate, required CI is green or intentionally skipped under repository policy, actionable review feedback is resolved, and the user knows whether the PR is ready, merged, or awaiting a specific decision. Continue monitoring external merge state only when a scheduled follow-up is useful and authorized.
