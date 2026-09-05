@@ -6,7 +6,8 @@ It is deliberately not a second agent harness, issue tracker, daemon, or replace
 
 ## What it coordinates
 
-- Superpowers for design, planning, worktrees, implementation discipline, review, and verification
+- Its own lean delivery workflow for planning, isolation, validation, review, and publication
+- Optional specialized skills, including Superpowers, when explicitly requested or justified by scale, risk, or repository policy
 - GitHub tooling for issues, pull requests, checks, and Actions evidence
 - Grim for Wistia and Shortcut context when available
 - Codex scheduled follow-ups for pending CI and review work
@@ -31,7 +32,7 @@ Changes to `skills/omakase/` therefore apply to the installed skill without a se
 - `tests/` verifies the skill contract and helpers.
 - `evals/` records behavioral scenarios that should remain true.
 
-Design specs and implementation plans under `docs/superpowers/` are local working artifacts. They are globally ignored and are not part of the repository's maintained documentation.
+Temporary design specs and implementation plans are working artifacts, not maintained repository documentation.
 
 ## Validation
 
