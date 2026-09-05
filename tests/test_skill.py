@@ -52,7 +52,6 @@ class OmakaseSkillContractTest(unittest.TestCase):
         self.assert_contains_all(
             text,
             (
-                "Superpowers",
                 "GitHub",
                 "repository-approved integrations",
                 "Lean review",
@@ -64,6 +63,35 @@ class OmakaseSkillContractTest(unittest.TestCase):
                 "CI failures",
                 "review feedback",
                 "Completion",
+            ),
+        )
+
+    def test_superpowers_is_optional_not_a_dependency(self):
+        skill = SKILL.read_text()
+        readme = (ROOT / "README.md").read_text()
+
+        self.assert_contains_all(
+            skill,
+            (
+                "Superpowers is optional",
+                "does not depend on it",
+                "explicitly requests it",
+            ),
+        )
+        self.assertIn("optional", readme.lower())
+        self.assertNotIn("superpowers:", skill)
+
+    def test_core_delivery_workflows_are_owned_directly(self):
+        text = SKILL.read_text()
+
+        self.assert_contains_all(
+            text,
+            (
+                "create an isolated worktree",
+                "proportionate to the change",
+                "Review the completed diff against the task",
+                "independent review",
+                "Inspect the diff and run applicable validation yourself",
             ),
         )
 

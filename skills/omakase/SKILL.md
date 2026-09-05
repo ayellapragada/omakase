@@ -13,11 +13,11 @@ Trigger for repository changes intended to land, including work from an issue or
 
 Do not trigger for one-off scripts, read-only exploration or review, diagnosis without a requested fix, ordinary file manipulation, or unrelated monitoring. If intent to deliver is ambiguous and affects what would be changed or published, ask rather than expanding the request silently.
 
-## Compose existing capabilities
+## Own the delivery contract
 
-Omakase is the conductor; use detailed workflows owned by other capabilities instead of restating them.
+Omakase directly defines the core workflow for planning, isolation, implementation, validation, review, publication, and follow-up.
 
-- Use the applicable Superpowers skills for design, planning, worktrees, TDD, debugging, review, verification, and branch finishing.
+- Superpowers is optional. Use it when the user explicitly requests it or when scale, risk, or repository policy warrants a deeper specialized workflow; Omakase does not depend on it.
 - Use available GitHub tooling for issues, pull requests, reviews, checks, and Actions evidence. `gh-fix-ci` is optional, not a dependency.
 - Use repository-approved integrations for issue or internal-service context when required by `AGENTS.md`. If a required integration is unavailable, report that limitation rather than searching for an undocumented private CLI.
 - Use Codex scheduled follow-ups for delayed CI, review, or merge checks.
@@ -29,7 +29,7 @@ Omakase is the conductor; use detailed workflows owned by other capabilities ins
 
 Keep ordinary delivery in the main implementation context. Run focused checks while developing and full applicable validation before publication. Every change intended to land gets one independent review of the completed diff; fix material findings, rerun affected validation, and request at most one scoped re-review when those fixes warrant it.
 
-Use `superpowers:subagent-driven-development` only when the user requests exhaustive execution, repository policy requires it, or scale and risk justify implementer-per-task review. Route every dispatch explicitly: cheapest capable tier for mechanical work, a balanced tier for ordinary implementation or review, and the strongest tier for architecture, security, concurrency, difficult debugging, or consequential final review. Always set both model and reasoning effort.
+Use implementer-per-task delegation only when the user requests exhaustive execution, repository policy requires it, or scale and risk justify the extra review cycle. Route every dispatch explicitly: cheapest capable tier for mechanical work, a balanced tier for ordinary implementation or review, and the strongest tier for architecture, security, concurrency, difficult debugging, or consequential final review. Always set both model and reasoning effort.
 
 ### Authority
 
@@ -47,7 +47,7 @@ Before editing:
 4. Inspect Git status and preserve unrelated changes.
 5. Ask only when missing information materially changes the result.
 
-Implementation is isolated by default. Reuse a clean task-specific worktree; otherwise use `superpowers:using-git-worktrees`. Without native isolation, use `<primary-checkout>/.worktrees/<task-slug>` after verifying it is ignored. Use that workflow only for environment detection and isolation: the Omakase profile owns setup and validation. Never nest worktrees or alter unrelated ones.
+Implementation is isolated by default. Reuse a clean task-specific worktree or create an isolated worktree with available native support. Without native isolation, use `<primary-checkout>/.worktrees/<task-slug>` after verifying it is ignored. Isolation is only for environment separation: the Omakase profile owns setup and validation. Never nest worktrees or alter unrelated ones.
 
 Preserve the task worktree while its pull request is open. After merge, remove only a clean Omakase-created worktree with the expected identity, then delete its local branch. Remote branch deletion requires explicit authorization.
 
@@ -65,7 +65,7 @@ If it exists, read it after higher-priority repository instructions. If absent, 
 
 ### Plan
 
-Use the applicable Superpowers design or planning workflow at a depth proportionate to the change. Once the user approves a design interactively, faithfully writing and self-reviewing its temporary artifacts and proceeding with implementation does not require a second approval. Ask again only if new evidence materially diverges from the approved scope, behavior, architecture, risk, acceptance criteria, or external actions.
+Plan at a depth proportionate to the change. For a straightforward, well-specified change, keep the plan concise and proceed. For work with meaningful product, architecture, security, or UX choices, explore the requirements and obtain design approval before implementation. Once the user approves a design interactively, faithfully writing and self-reviewing any temporary working artifacts and proceeding with implementation does not require a second approval. Ask again only if new evidence materially diverges from the approved scope, behavior, architecture, risk, acceptance criteria, or external actions.
 
 ### Implement and validate
 
@@ -77,7 +77,7 @@ Do not block independent discovery, design, or review behind a long baseline whe
 
 ### Review and publish
 
-Review the completed diff against the task and use the applicable review and branch-finishing skills. Treat a project change intended to land as authorization to publish it through a pull request after validation. Do not present the branch-finishing options menu or ask whether to push; proceed directly to the pull-request path unless the user explicitly asks to keep the work local or an attention condition prevents publication.
+Review the completed diff against the task, repository policy, and acceptance criteria. Obtain one independent review for ordinary changes; increase review depth only when risk warrants it. Treat a project change intended to land as authorization to publish it through a pull request after validation. Do not present the branch-finishing options menu or ask whether to push; proceed directly to the pull-request path unless the user explicitly asks to keep the work local or an attention condition prevents publication.
 
 On the default publication path, follow the resolved convention for each artifact, preserve the pull-request template, commit only task-related changes, push the task branch, create or update the pull request, and read the resulting commit and PR state back. This default does not authorize merging, force-pushing, releasing, or any destructive or materially broader action.
 
@@ -89,7 +89,7 @@ When a documentation-only change validly uses a skip-CI convention, confirm the 
 
 If required checks or mergeability are pending, schedule a follow-up in the current Codex task carrying the repository and PR URL, branch and worktree, pending conditions, completed validation, and next permitted action. Concrete blockers such as conflicts, failed checks, draft status, or unsatisfied review requirements must be reported and handled or escalated as appropriate. Stop follow-up when the PR becomes ready, closes or merges, or attention is required.
 
-For CI failures, gather logs and commit state, debug the root cause, repair clear in-scope failures in the same worktree, validate, push, and resume monitoring. For review feedback, fetch the full context, apply `superpowers:receiving-code-review`, implement clear in-scope requests, validate, push, and resume monitoring. Escalate conflicting or materially ambiguous feedback.
+For CI failures, gather logs and commit state, debug the root cause, repair clear in-scope failures in the same worktree, validate, push, and resume monitoring. For review feedback, fetch the full context, verify each request against the code and task, implement clear in-scope requests, validate, push, and resume monitoring. Escalate conflicting or materially ambiguous feedback.
 
 ## Completion
 
