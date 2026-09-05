@@ -130,8 +130,28 @@ class OmakaseSkillContractTest(unittest.TestCase):
         profile = yaml.safe_load(PROFILE_TEMPLATE.read_text())
 
         self.assertNotIn("runtime", profile)
-        self.assertEqual(profile["bootstrap"]["steps"], [{"runtime": None, "run": None}])
-        self.assertEqual(profile["validation"]["quick"], [{"runtime": None, "run": None}])
+        expected_step = {
+            "runtime": None,
+            "run": None,
+            "env": {},
+            "needs": [],
+        }
+        self.assertEqual(profile["bootstrap"]["steps"], [expected_step])
+        self.assertEqual(profile["validation"]["quick"], [expected_step])
+
+    def test_profile_steps_capture_execution_requirements_structurally(self):
+        guidance = PROJECT_GUIDANCE.read_text()
+
+        self.assert_contains_all(
+            guidance,
+            (
+                "`env`",
+                "`needs`",
+                "Apply `env` before the first attempt",
+                "Request the execution context named by `needs` before the first attempt",
+                "Do not duplicate structured step requirements in `worktree.notes`",
+            ),
+        )
 
     def test_operational_mechanics_live_in_project_guidance(self):
         skill = SKILL.read_text()

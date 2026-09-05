@@ -6,11 +6,15 @@ bootstrap:
   steps:
     - runtime:
       run:
+      env: {}
+      needs: []
 
 validation:
   quick:
     - runtime:
       run:
+      env: {}
+      needs: []
   full: []
 
 worktree:

@@ -32,7 +32,7 @@ Established repository entry points can be used without a redundant confirmation
 The schema is intentionally small and extensible:
 
 - `version`: profile format version; currently `1`.
-- `bootstrap.steps`: ordered idempotent entries with `runtime` and `run` fields required to make a fresh worktree usable.
+- `bootstrap.steps`: ordered idempotent entries required to make a fresh worktree usable.
 - `validation.quick`: focused or inexpensive checks used during implementation.
 - `validation.full`: the local completion checks.
 - `worktree.required_local_files`: paths that may need to be made available in a worktree; never include their contents.
@@ -42,7 +42,14 @@ The schema is intentionally small and extensible:
 
 Unknown fields should be ignored rather than treated as fatal so the profile can evolve without a migration ceremony.
 
-Run `bootstrap.steps` sequentially and stop at the first failure. Validation entries use the same `{runtime, run}` shape. `runtime` identifies the tool family needed for that one command; it is not a shell prefix.
+Run `bootstrap.steps` sequentially and stop at the first failure. Bootstrap and validation entries share this shape:
+
+- `runtime`: the tool family needed for the command; it is not a shell prefix.
+- `run`: the repository command to execute.
+- `env`: an optional mapping of non-secret environment variables required by that command.
+- `needs`: an optional list of execution capabilities that must be obtained before running the command, such as `network`, `localhost`, or `browser`.
+
+Apply `env` before the first attempt. Request the execution context named by `needs` before the first attempt, using the narrowest available permission for each capability. These fields describe how to execute the recorded repository command; they do not grant new authority for destructive operations, releases, merges, or unrelated external changes. Omit empty optional fields from established profiles. Do not duplicate structured step requirements in `worktree.notes`.
 
 Align bootstrap steps with failure and retry boundaries when the repository provides evidence for doing so. If repository-supported phase-specific commands or flags expose dependency installation, database preparation, or generation as independently repeatable phases, record those phases as separate ordered steps. After repairing a failure, resume at the failed profile step rather than rerunning earlier successful expensive steps. Do not decompose a canonical entry point into invented shell setup; when the repository supports only one setup command and a failed mutation leaves state untrusted, rerun that clean command.
 
@@ -56,7 +63,7 @@ For an asdf-managed project, resolve only the executable needed by the current s
 
 Treat mutation of one dependency tree as an exclusive operation. Do not overlap an installer with another installer or a test, build, or hook that consumes the same tree. A command that is merely quiet may still be working; retain its live session and confirm that it exited before retrying. If an install fails or is interrupted after mutation, treat the tree as untrusted and recover with the repository's clean deterministic install or bootstrap command rather than layering an incremental install over partial state.
 
-Before a dependency installer mutates its tree, check known harness constraints that can be established locally. Confirm that package-manager cache and log directories are writable; if not, use task-scoped directories under the system temporary directory on the first attempt. If the installer is known to require registry access unavailable in the sandbox, obtain the required execution context before starting it. Combine known constraints into one attempt and treat them as execution-environment handling, not project knowledge.
+Before a dependency installer mutates its tree, check known harness constraints that can be established locally. Confirm that package-manager cache and log directories are writable; if not, record a writable directory under the system temporary directory in the step's `env` mapping. Prefer a task-scoped cache; a repository-scoped cache is appropriate when the package manager supports concurrent access and the stable path is needed across worktrees. If the installer is known to require registry access unavailable in the sandbox, record `network` in `needs`. Combine known constraints into one first attempt.
 
 Before an expensive validation command, inspect its profile notes and known constraints. If repository evidence or a verified prior run shows that it needs localhost sockets, browser processes, external services, or network access unavailable in the default sandbox, request the required execution context on the first run. Do not infer broader access from speculation or persist a one-off sandbox failure.
 
@@ -65,7 +72,7 @@ Before an expensive validation command, inspect its profile notes and known cons
 Do not update the profile merely because a command failed. First classify the cause:
 
 - Durable and reproducible: wrong runtime selection, a consistently required bootstrap step, a required local file path, or a stable validation command. Fix, rerun, then persist the learning.
-- Stable harness constraint: a fixed command repeatably needs a specific execution context, such as localhost socket permission. After a successful verification, record a concise, non-secret note in `worktree.notes` so the next task can preflight it.
+- Stable harness constraint: a fixed command repeatably needs a specific environment value or execution capability. After a successful verification, record it on that command with `env` or `needs`; reserve `worktree.notes` for caveats that cannot be represented structurally.
 - Dirty bootstrap: a setup command succeeds but rewrites a tracked lockfile or generated source. Prefer a repository-supported clean alternative and verify it leaves tracked files unchanged before persisting it.
 - Transient: network outage, registry hiccup, temporary CI incident, one-time cache corruption, or a one-off sandbox denial. Recover if possible, but do not memorialize it.
 - Unsafe or uncertain: secret acquisition, novel host mutation, infrastructure changes, or a speculative workaround. Ask for the smallest required decision before proceeding.
