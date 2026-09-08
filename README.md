@@ -32,6 +32,8 @@ Changes to `skills/omakase/` therefore apply to the installed skill without a se
 - `skills/omakase/references/` contains focused supporting guidance.
 - `skills/omakase/assets/` contains the local project-profile template.
 - `skills/omakase/scripts/` contains deterministic helper scripts.
+- `skills/omakase/agents/` contains Codex-facing display metadata.
+- `scripts/` contains repository-level validation entry points.
 - `tests/` verifies the skill contract and helpers.
 - `evals/` records behavioral scenarios that should remain true.
 
@@ -39,14 +41,15 @@ Temporary design specs and implementation plans are working artifacts, not maint
 
 ## Validation
 
-Run the contract and helper tests:
+Install the development dependency, then run the contract and helper tests:
 
 ```bash
+python3 -m pip install -r requirements-dev.txt
 python3 -m unittest discover -s tests -v
 ```
 
 Validate the Codex skill structure:
 
 ```bash
-python3 ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/omakase
+python3 scripts/validate_skill.py skills/omakase
 ```

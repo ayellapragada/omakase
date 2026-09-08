@@ -59,7 +59,7 @@ Each repository may have one globally ignored `.omakase.local.yml` in its primar
 python3 scripts/profile_path.py --repo <checkout-or-worktree>
 ```
 
-If it exists, read it after higher-priority repository instructions. If absent, use [assets/omakase.local.example.yml](assets/omakase.local.example.yml) and [references/project-guidance.md](references/project-guidance.md) to create the smallest evidence-backed profile, verify it in the isolated worktree, and tell the user. Update it only with durable, successfully verified machine-local knowledge; never store secrets or transient failures.
+If it exists, read it after higher-priority repository instructions. If absent, use [assets/omakase.local.example.yml](assets/omakase.local.example.yml) and [references/project-guidance.md](references/project-guidance.md) to create the smallest evidence-backed profile. Before creating it, prove that Git ignores the resolved path; if not, stop and report the missing protection. Verify a created profile in the isolated worktree and tell the user. Update it only with durable, successfully verified machine-local knowledge; never store secrets or transient failures.
 
 ## Delivery
 

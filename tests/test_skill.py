@@ -250,6 +250,18 @@ class OmakaseSkillContractTest(unittest.TestCase):
         self.assertTrue(PROFILE_TEMPLATE.is_file())
         self.assertTrue(PROFILE_RESOLVER.is_file())
 
+    def test_profile_creation_requires_ignore_preflight(self):
+        skill = SKILL.read_text()
+        guidance = PROJECT_GUIDANCE.read_text()
+        command = (
+            'git -C "$(dirname "$profile_path")" check-ignore -q -- '
+            '"$profile_path"'
+        )
+
+        self.assertIn("Before creating it", skill)
+        self.assertIn(command, guidance)
+        self.assertIn("stop without creating the profile", guidance)
+
     def test_profile_template_selects_runtime_per_step(self):
         profile = yaml.safe_load(PROFILE_TEMPLATE.read_text())
 
