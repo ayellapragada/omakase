@@ -13,6 +13,7 @@ REPOSITORY_CONVENTIONS = (
     SKILL_ROOT / "references" / "repository-conventions.md"
 )
 VISUAL_PRODUCT_WORK = SKILL_ROOT / "references" / "visual-product-work.md"
+TREEHOUSE_WORKTREES = SKILL_ROOT / "references" / "treehouse-worktrees.md"
 PROFILE_TEMPLATE = SKILL_ROOT / "assets" / "omakase.local.example.yml"
 PROFILE_RESOLVER = SKILL_ROOT / "scripts" / "profile_path.py"
 
@@ -58,7 +59,7 @@ class OmakaseSkillContractTest(unittest.TestCase):
                 "Lean review",
                 "model and reasoning effort",
                 "attention request",
-                "<primary-checkout>/.worktrees/<task-slug>",
+                "Treehouse",
                 "does not require a second approval",
                 "scheduled follow-up",
                 "CI failures",
@@ -95,6 +96,62 @@ class OmakaseSkillContractTest(unittest.TestCase):
                 "Inspect the diff and run applicable validation yourself",
             ),
         )
+
+    def test_treehouse_is_required_when_omakase_provisions_isolation(self):
+        text = SKILL.read_text()
+
+        self.assert_contains_all(
+            text,
+            (
+                "Treehouse is the required provisioning layer",
+                "reuse it rather than acquiring another",
+                "leave its cleanup to the provisioning environment",
+                "references/treehouse-worktrees.md",
+                "Do not silently fall back",
+            ),
+        )
+        self.assertNotIn("<primary-checkout>/.worktrees/<task-slug>", text)
+        self.assertTrue(TREEHOUSE_WORKTREES.is_file())
+
+    def test_treehouse_reference_defines_identity_checked_lease_lifecycle(self):
+        guidance = TREEHOUSE_WORKTREES.read_text()
+
+        self.assert_contains_all(
+            guidance,
+            (
+                "project-local pool",
+                "get --lease",
+                "--json",
+                "--root .",
+                "--no-fetch",
+                'git switch --detach "$base_ref"',
+                "lease_id",
+                "lease_holder",
+                "detached HEAD",
+                "Keep the lease while its pull request is open",
+                "--if-lease-id",
+                "--if-lease-holder",
+                "Do not return",
+                "Treehouse hooks do not own bootstrap",
+            ),
+        )
+        self.assertNotIn("--base", guidance)
+        self.assertNotIn("Treehouse's ignored-file seeding", guidance)
+
+        guarded_return = (
+            'treehouse return --if-lease-id "$lease_id" '
+            '--if-lease-holder "$lease_holder" "$path"'
+        )
+        return_position = guidance.index(guarded_return)
+        for precondition in (
+            "landing or pull-request outcome is current and proven",
+            "exact managed worktree recorded for this task",
+            "still match the live Treehouse allocation",
+            "worktree is clean",
+            "no task process is still using it",
+        ):
+            with self.subTest(precondition=precondition):
+                self.assertLess(guidance.index(precondition), return_position)
 
     def test_visual_product_work_is_routed_and_conditional(self):
         text = SKILL.read_text()
