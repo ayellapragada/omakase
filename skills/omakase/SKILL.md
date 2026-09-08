@@ -47,9 +47,9 @@ Before editing:
 4. Inspect Git status and preserve unrelated changes.
 5. Ask only when missing information materially changes the result.
 
-Implementation is isolated by default. Reuse a clean task-specific worktree or create an isolated worktree with available native support. Without native isolation, use `<primary-checkout>/.worktrees/<task-slug>` after verifying it is ignored. Isolation is only for environment separation: the Omakase profile owns setup and validation. Never nest worktrees or alter unrelated ones.
+Implementation is isolated by default. If the task already runs in a clean task-specific worktree, reuse it rather than acquiring another. Otherwise, Treehouse is the required provisioning layer: read [references/treehouse-worktrees.md](references/treehouse-worktrees.md), verify its required lease interface, and create an isolated worktree from its project-local pool. Do not silently fall back to a raw Git worktree when Treehouse is missing or incompatible; report the prerequisite and request the smallest action needed to restore it.
 
-Preserve the task worktree while its pull request is open. After merge, remove only a clean Omakase-created worktree with the expected identity, then delete its local branch. Remote branch deletion requires explicit authorization.
+Isolation remains environment separation only: the Omakase profile owns setup and validation. Preserve either workspace while its pull request is open. For a pre-existing task worktree, leave its cleanup to the provisioning environment; for an Omakase-acquired lease, follow the identity-checked return rules in the Treehouse reference after landing. Never nest worktrees or alter unrelated ones. Remote branch deletion requires explicit authorization.
 
 ## Personal project profile
 

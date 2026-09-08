@@ -11,7 +11,11 @@ These scenarios are the maintained behavioral acceptance set for the skill.
 | “Diagnose this failing test, but don’t change anything.” | Do not trigger; remain read-only. |
 | “Review this diff and report concerns.” | Do not trigger the delivery lifecycle; use review capabilities only. |
 | Work begins in a task-specific worktree. | Reuse it rather than nesting another worktree. |
-| Work begins in a primary checkout without native isolation. | Create `<primary-checkout>/.worktrees/<task-slug>` after verifying it is ignored. |
+| Work begins in a primary checkout. | Require a compatible Treehouse, acquire a project-local leased worktree with machine-readable identity, create the task branch there, and retain the allocation details. |
+| Treehouse is missing or lacks the required lease interface. | Stop before editing, report the prerequisite, and request installation or repair instead of silently creating a raw Git worktree. |
+| The task pull request remains open for CI or review. | Keep the same Treehouse lease and warmed worktree available for follow-up changes. |
+| The task lands and its Treehouse allocation is clean. | Prove the landing and live lease identity, conditionally return the exact allocation, read back its released state, then delete the safe local task branch. |
+| The pull request closes unmerged or the allocation is dirty, mismatched, or unverifiable. | Preserve the lease and report the concrete decision or repair needed; do not return or destroy the slot. |
 | A design has been approved interactively. | Write and self-review any required temporary artifacts, then proceed without seeking duplicate approval unless the result materially diverges. |
 | A change materially alters an existing rendered UI. | Activate the visual product path, capture the meaningful baseline before editing, verify representative states in a browser, and embed matched before/after screenshots in the pull-request body. |
 | A change touches frontend code but only alters nonvisual data flow. | Stay on the ordinary delivery path; do not add visual exploration or screenshots that would not help implementation or review. |
@@ -24,7 +28,7 @@ These scenarios are the maintained behavioral acceptance set for the skill.
 | An open PR changes only prose documentation or agent guidance with no runtime effect. | Review the diff and run only applicable documentation checks; skip runtime tests and builds, use any documented skip-CI convention, and do not wait for intentionally skipped CI. |
 | A repository has no `.omakase.local.yml`. | Generate the smallest evidence-backed, globally ignored profile in the primary checkout; validate it in isolation and report what was learned. |
 | A linked worktree’s primary checkout has a profile. | Resolve and use the shared profile rather than creating a copy. |
-| The isolation workflow offers setup and baseline commands. | Use only its isolation steps; let the profile own setup and validation. |
+| Treehouse offers lifecycle hooks or a reused slot already has dependencies. | Let Treehouse own isolation and reuse only; run the profile's correctness-critical bootstrap and validation because hooks are non-fatal and cached dependencies are not proof of freshness. |
 | Bootstrap has supported, independently repeatable phases. | Record ordered steps at real failure boundaries and resume at the failed step; do not invent a decomposition of a canonical command. |
 | Bootstrap succeeds but rewrites tracked files. | Reject it as durable setup and select a repository-supported clean alternative. |
 | A repository mixes runtimes. | Select the runtime per profile entry; do not wrap a polyglot process tree in one runtime prefix. |

@@ -12,6 +12,7 @@ It is deliberately not a second agent harness, issue tracker, daemon, or replace
 - Repository-approved integrations for issue and internal-service context when available
 - Codex scheduled follow-ups for pending CI and review work
 - A globally ignored `.omakase.local.yml` for verified machine-local project knowledge
+- Treehouse as the required reusable-worktree layer when Codex has not already isolated the task
 
 ## Installation
 
@@ -22,6 +23,8 @@ The active personal installation links this repository's skill directory into th
 ```
 
 Changes to `skills/omakase/` therefore apply to the installed skill without a separate copy or packaging step.
+
+[Treehouse](https://github.com/kunchenguid/treehouse) is a required machine prerequisite for work that begins in a primary checkout. Omakase reuses an existing task-specific worktree when Codex already supplied one; otherwise it leases a warmed Treehouse slot from a project-local pool and retains that lease through publication and follow-up.
 
 ## Repository structure
 
