@@ -6,10 +6,10 @@ The profile supplements rather than replaces `AGENTS.md`, repository documentati
 
 ## One profile across worktrees
 
-Keep the file at the root of the primary checkout. A globally ignored file is not automatically present in linked worktrees, so resolve it through Git metadata rather than looking only in the current directory:
+Keep the file at the root of the primary checkout. A globally ignored file is not automatically present in linked worktrees, so resolve it through Git metadata rather than looking only in the current directory. From this skill directory, run:
 
 ```bash
-python3 scripts/profile_path.py --repo <checkout-or-worktree>
+profile_path="$(python3 scripts/profile_path.py --repo <checkout-or-worktree>)"
 ```
 
 The resolver returns the first checkout reported by `git worktree list --porcelain`, which is the primary checkout. This gives every task worktree one shared profile that can improve over time.
@@ -18,12 +18,19 @@ The resolver returns the first checkout reported by `git worktree list --porcela
 
 When a repository has no profile, Codex should create a minimal one without turning setup into an onboarding interview:
 
-1. Read active instructions, README setup guidance, runtime version files, CI workflows, and existing automation.
-2. Inspect established repository entry points such as `bin/setup`, `script/bootstrap`, `package.json` scripts, and documented Make targets.
-3. Start from `assets/omakase.local.example.yml`, retaining only evidence-backed fields.
-4. Run the selected bootstrap or validation command in the isolated worktree.
-5. Inspect `git status` and confirm bootstrap did not unexpectedly rewrite tracked files.
-6. Keep the generated profile only after the relevant command succeeds cleanly, and tell the user what was learned.
+1. Before writing, verify that Git ignores the resolved path:
+
+   ```bash
+   git -C "$(dirname "$profile_path")" check-ignore -q -- "$profile_path"
+   ```
+
+   If this fails, stop without creating the profile and report that `.omakase.local.yml` must be added to the user's global Git excludes file.
+2. Read active instructions, README setup guidance, runtime version files, CI workflows, and existing automation.
+3. Inspect established repository entry points such as `bin/setup`, `script/bootstrap`, `package.json` scripts, and documented Make targets.
+4. Start from `assets/omakase.local.example.yml`, retaining only evidence-backed fields.
+5. Run the selected bootstrap or validation command in the isolated worktree.
+6. Inspect `git status` and confirm bootstrap did not unexpectedly rewrite tracked files.
+7. Keep the generated profile only after the relevant command succeeds cleanly, and tell the user what was learned.
 
 Established repository entry points can be used without a redundant confirmation when they are safe and fall within the authorized coding task. Ask before writing novel shell setup, fetching secrets, modifying infrastructure, weakening verification, or doing anything destructive.
 
