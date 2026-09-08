@@ -12,6 +12,7 @@ PROJECT_GUIDANCE = SKILL_ROOT / "references" / "project-guidance.md"
 REPOSITORY_CONVENTIONS = (
     SKILL_ROOT / "references" / "repository-conventions.md"
 )
+VISUAL_PRODUCT_WORK = SKILL_ROOT / "references" / "visual-product-work.md"
 PROFILE_TEMPLATE = SKILL_ROOT / "assets" / "omakase.local.example.yml"
 PROFILE_RESOLVER = SKILL_ROOT / "scripts" / "profile_path.py"
 
@@ -92,6 +93,44 @@ class OmakaseSkillContractTest(unittest.TestCase):
                 "Review the completed diff against the task",
                 "independent review",
                 "Inspect the diff and run applicable validation yourself",
+            ),
+        )
+
+    def test_visual_product_work_is_routed_and_conditional(self):
+        text = SKILL.read_text()
+
+        self.assert_contains_all(
+            text,
+            (
+                "references/visual-product-work.md",
+                "materially affects the rendered product experience",
+                "Do not activate it merely because a change has a frontend file",
+            ),
+        )
+        self.assertTrue(VISUAL_PRODUCT_WORK.is_file())
+
+    def test_visual_product_work_defines_pr_evidence(self):
+        guidance = VISUAL_PRODUCT_WORK.read_text()
+
+        self.assert_contains_all(
+            guidance,
+            (
+                "rendered UI, layout, styling, interaction states, or product imagery",
+                "Capture the meaningful baseline before implementation",
+                "same state, data, viewport, and theme",
+                "Consider image generation",
+                "Do not generate imagery",
+                "independent visual critique",
+                "bounded",
+                "## Screenshots",
+                "descriptive alt text",
+                "new surface",
+                "temporary delivery artifacts",
+                "Do not commit them solely",
+                "--attach",
+                "pull-request template",
+                "Read the published body back",
+                "not review-ready",
             ),
         )
 

@@ -63,6 +63,10 @@ If it exists, read it after higher-priority repository instructions. If absent, 
 
 ## Delivery
 
+### Visual product work
+
+When a change materially affects the rendered product experience, read [references/visual-product-work.md](references/visual-product-work.md) before implementation. Use that path for changes to UI, layout, styling, interaction states, or product imagery when visual exploration or evidence will improve the result. Do not activate it merely because a change has a frontend file; nonvisual logic, infrastructure, and internal refactors stay on the ordinary delivery path.
+
 ### Plan
 
 Plan at a depth proportionate to the change. For a straightforward, well-specified change, keep the plan concise and proceed. For work with meaningful product, architecture, security, or UX choices, explore the requirements and obtain design approval before implementation. Once the user approves a design interactively, faithfully writing and self-reviewing any temporary working artifacts and proceeding with implementation does not require a second approval. Ask again only if new evidence materially diverges from the approved scope, behavior, architecture, risk, acceptance criteria, or external actions.

@@ -13,6 +13,13 @@ These scenarios are the maintained behavioral acceptance set for the skill.
 | Work begins in a task-specific worktree. | Reuse it rather than nesting another worktree. |
 | Work begins in a primary checkout without native isolation. | Create `<primary-checkout>/.worktrees/<task-slug>` after verifying it is ignored. |
 | A design has been approved interactively. | Write and self-review any required temporary artifacts, then proceed without seeking duplicate approval unless the result materially diverges. |
+| A change materially alters an existing rendered UI. | Activate the visual product path, capture the meaningful baseline before editing, verify representative states in a browser, and embed matched before/after screenshots in the pull-request body. |
+| A change touches frontend code but only alters nonvisual data flow. | Stay on the ordinary delivery path; do not add visual exploration or screenshots that would not help implementation or review. |
+| A pull request adds a brand-new visual surface. | State that no meaningful before view exists and embed representative after screenshots directly in the pull-request body. |
+| A new product experience would benefit from distinctive custom imagery. | Consider the dedicated image-generation capability, inspect and optimize accepted output, and use it only when it serves the product direction. |
+| A routine control already fits the product's established design system. | Reuse the existing system rather than generating decorative imagery or forcing a novel visual direction. |
+| A substantial visual redesign is ready for review. | Include screenshot-based independent visual critique, address prioritized material findings, and keep any re-review scoped and bounded. |
+| Screenshot upload fails for a qualifying visual change. | Retry safely or report the concrete blocker; do not call the pull request review-ready while required images are missing or broken. |
 | A long baseline can run alongside non-mutating work. | Retain it asynchronously while continuing independent discovery, design, planning, or review; rerun full validation after implementation. |
 | An open PR changes only prose documentation or agent guidance with no runtime effect. | Review the diff and run only applicable documentation checks; skip runtime tests and builds, use any documented skip-CI convention, and do not wait for intentionally skipped CI. |
 | A repository has no `.omakase.local.yml`. | Generate the smallest evidence-backed, globally ignored profile in the primary checkout; validate it in isolation and report what was learned. |
