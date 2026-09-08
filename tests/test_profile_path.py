@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -54,6 +55,33 @@ class ProfilePathTest(unittest.TestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("not inside a Git repository", result.stderr)
+
+    def test_rejects_a_bare_repository_without_a_working_tree(self):
+        with tempfile.TemporaryDirectory() as directory:
+            bare = Path(directory) / "project.git"
+            self.git("init", "--bare", str(bare), cwd=directory)
+
+            result = self.resolve(bare)
+
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("bare repository has no working tree", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+
+    def test_reports_a_clear_error_when_git_is_unavailable(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--repo", directory],
+                check=False,
+                capture_output=True,
+                text=True,
+                env={**os.environ, "PATH": ""},
+            )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("git executable is unavailable", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
 
 
 if __name__ == "__main__":

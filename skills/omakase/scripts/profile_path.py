@@ -13,18 +13,26 @@ PROFILE_NAME = ".omakase.local.yml"
 
 
 def primary_checkout(repo: Path) -> Path:
-    result = subprocess.run(
-        ["git", "-C", str(repo), "worktree", "list", "--porcelain"],
-        check=False,
-        capture_output=True,
-        text=True,
-    )
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(repo), "worktree", "list", "--porcelain"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except FileNotFoundError as error:
+        raise RuntimeError("git executable is unavailable") from error
+
     if result.returncode != 0:
         raise RuntimeError(
             f"{repo}: not inside a Git repository with accessible worktree metadata"
         )
 
-    for line in result.stdout.splitlines():
+    first_record = result.stdout.split("\n\n", 1)[0].splitlines()
+    if "bare" in first_record:
+        raise RuntimeError(f"{repo}: bare repository has no working tree")
+
+    for line in first_record:
         if line.startswith("worktree "):
             return Path(line.removeprefix("worktree ")).resolve()
 
