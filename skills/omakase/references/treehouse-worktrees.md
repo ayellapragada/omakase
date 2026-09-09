@@ -6,6 +6,8 @@ Treehouse is Omakase's required provisioning layer when the current task is not 
 
 Resolve the primary checkout and run Treehouse from there. Use a project-local pool with `--root .` so the pool remains inside the repository's writable boundary. Before the first mutation, verify that `treehouse` exists and that its help exposes every flag used below: leased JSON acquisition, the project-local root, optional no-fetch acquisition, JSON status, and conditional return by both lease identity fields. If the interface is missing or incompatible, stop before editing and request installation or repair. Do not silently fall back to a raw Git worktree.
 
+During intake, and in any case before requesting another allocation, read `treehouse status --root . --json` and opportunistically reconcile existing leases. For each leased Git worktree with a local branch, use the current repository and exact head branch to look up its pull request. Return an allocation only when exactly one matching pull request is proven merged and every safeguard in [Retain and return](#retain-and-return) passes against the live status record. Leave open pull requests and leases without a matching pull request untouched. Preserve closed-unmerged, multiply matched, dirty, live-process, identity-mismatched, or otherwise unverifiable allocations and report the concrete state and smallest required action. Reconciliation is best-effort maintenance, not authority to merge, discard work, force a return, or delete a remote branch.
+
 Resolve the task's base branch and fetch required refs once. When those refs were already fetched and verified during intake, acquire with this shape to avoid a duplicate network operation:
 
 ```bash
