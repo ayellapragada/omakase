@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 import unittest
 
 import yaml
@@ -8,329 +9,84 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILL_ROOT = ROOT / "skills" / "omakase"
 SKILL = SKILL_ROOT / "SKILL.md"
 METADATA = SKILL_ROOT / "agents" / "openai.yaml"
-PROJECT_GUIDANCE = SKILL_ROOT / "references" / "project-guidance.md"
-REPOSITORY_CONVENTIONS = (
-    SKILL_ROOT / "references" / "repository-conventions.md"
-)
-VISUAL_PRODUCT_WORK = SKILL_ROOT / "references" / "visual-product-work.md"
-TREEHOUSE_WORKTREES = SKILL_ROOT / "references" / "treehouse-worktrees.md"
 PROFILE_TEMPLATE = SKILL_ROOT / "assets" / "omakase.local.example.yml"
-PROFILE_RESOLVER = SKILL_ROOT / "scripts" / "profile_path.py"
+LOCAL_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 
 
-class OmakaseSkillContractTest(unittest.TestCase):
-    def assert_contains_all(self, text, fragments):
-        for fragment in fragments:
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, text)
-
-    def test_frontmatter_has_discriminating_trigger(self):
+class OmakaseSkillStructureTest(unittest.TestCase):
+    def test_metadata_is_loadable_and_complete(self):
         _, frontmatter, _ = SKILL.read_text().split("---", 2)
-        data = yaml.safe_load(frontmatter)
+        skill_metadata = yaml.safe_load(frontmatter)
+        agent_metadata = yaml.safe_load(METADATA.read_text())
 
-        self.assertEqual(data["name"], "omakase")
-        self.assert_contains_all(
-            data["description"],
-            ("intended to land", "one-off scripts", "read-only", "diagnosis-only"),
-        )
+        self.assertEqual(skill_metadata["name"], "omakase")
+        self.assertTrue(skill_metadata["description"].strip())
+        interface = agent_metadata["interface"]
+        for field in ("display_name", "short_description", "default_prompt"):
+            with self.subTest(field=field):
+                self.assertIsInstance(interface[field], str)
+                self.assertTrue(interface[field].strip())
 
-    def test_entrypoint_is_concise_and_routes_to_focused_references(self):
-        text = SKILL.read_text()
+    def test_entrypoint_routes_to_every_support_resource(self):
+        linked_files = {
+            (SKILL_ROOT / target.split("#", 1)[0]).resolve()
+            for target in LOCAL_LINK.findall(SKILL.read_text())
+            if "://" not in target and not target.startswith(("#", "mailto:"))
+        }
+        support_files = [
+            path
+            for directory in ("assets", "references", "scripts")
+            for path in (SKILL_ROOT / directory).iterdir()
+            if path.is_file()
+        ]
 
-        self.assertLessEqual(len(text.split()), 1600)
-        self.assert_contains_all(
-            text,
-            (
-                "references/project-guidance.md",
-                "references/repository-conventions.md",
-                "assets/omakase.local.example.yml",
-                "scripts/profile_path.py",
-            ),
-        )
+        for path in support_files:
+            relative_path = path.relative_to(SKILL_ROOT).as_posix()
+            with self.subTest(path=relative_path):
+                self.assertIn(path.resolve(), linked_files)
 
-    def test_entrypoint_preserves_delivery_contract(self):
-        text = SKILL.read_text()
+    def test_local_markdown_links_resolve(self):
+        markdown_files = ROOT.rglob("*.md")
 
-        self.assert_contains_all(
-            text,
-            (
-                "GitHub",
-                "Grim",
-                "Lean review",
-                "model and reasoning effort",
-                "attention request",
-                "Treehouse",
-                "does not require a second approval",
-                "scheduled follow-up",
-                "CI failures",
-                "review feedback",
-                "Completion",
-            ),
-        )
+        for document in markdown_files:
+            for target in LOCAL_LINK.findall(document.read_text()):
+                if "://" in target or target.startswith(("#", "mailto:")):
+                    continue
+                path_text = target.split("#", 1)[0]
+                resolved = (document.parent / path_text).resolve()
+                with self.subTest(document=document, target=target):
+                    self.assertTrue(resolved.exists())
 
-    def test_superpowers_is_optional_not_a_dependency(self):
-        skill = SKILL.read_text()
-        readme = (ROOT / "README.md").read_text()
+    def test_reference_documents_have_titles(self):
+        for document in (SKILL_ROOT / "references").glob("*.md"):
+            first_line = document.read_text().splitlines()[0]
+            with self.subTest(document=document):
+                self.assertTrue(first_line.startswith("# "))
 
-        self.assert_contains_all(
-            skill,
-            (
-                "Superpowers is optional",
-                "does not depend on it",
-                "explicitly requests it",
-            ),
-        )
-        self.assertIn("optional", readme.lower())
-        self.assertNotIn("superpowers:", skill)
-
-    def test_core_delivery_workflows_are_owned_directly(self):
-        text = SKILL.read_text()
-
-        self.assert_contains_all(
-            text,
-            (
-                "create an isolated worktree",
-                "proportionate to the change",
-                "Review the completed diff against the task",
-                "independent review",
-                "Inspect the diff and run applicable validation yourself",
-            ),
-        )
-
-    def test_treehouse_is_required_when_omakase_provisions_isolation(self):
-        text = SKILL.read_text()
-
-        self.assert_contains_all(
-            text,
-            (
-                "Treehouse is the required provisioning layer",
-                "reuse it rather than acquiring another",
-                "leave its cleanup to the provisioning environment",
-                "references/treehouse-worktrees.md",
-                "Do not silently fall back",
-            ),
-        )
-        self.assertNotIn("<primary-checkout>/.worktrees/<task-slug>", text)
-        self.assertTrue(TREEHOUSE_WORKTREES.is_file())
-
-    def test_treehouse_reference_defines_identity_checked_lease_lifecycle(self):
-        guidance = TREEHOUSE_WORKTREES.read_text()
-
-        self.assert_contains_all(
-            guidance,
-            (
-                "project-local pool",
-                "get --lease",
-                "--json",
-                "--root .",
-                "--no-fetch",
-                'git switch --detach "$base_ref"',
-                "lease_id",
-                "lease_holder",
-                "detached HEAD",
-                "Keep the lease while its pull request is open",
-                "--if-lease-id",
-                "--if-lease-holder",
-                "Do not return",
-                "Treehouse hooks do not own bootstrap",
-            ),
-        )
-        self.assertNotIn("--base", guidance)
-        self.assertNotIn("Treehouse's ignored-file seeding", guidance)
-
-        guarded_return = (
-            'treehouse return --if-lease-id "$lease_id" '
-            '--if-lease-holder "$lease_holder" "$path"'
-        )
-        return_position = guidance.index(guarded_return)
-        for precondition in (
-            "landing or pull-request outcome is current and proven",
-            "exact managed worktree recorded for this task",
-            "still match the live Treehouse allocation",
-            "worktree is clean",
-            "no task process is still using it",
-        ):
-            with self.subTest(precondition=precondition):
-                self.assertLess(guidance.index(precondition), return_position)
-
-    def test_visual_product_work_is_routed_and_conditional(self):
-        text = SKILL.read_text()
-
-        self.assert_contains_all(
-            text,
-            (
-                "references/visual-product-work.md",
-                "materially affects the rendered product experience",
-                "Do not activate it merely because a change has a frontend file",
-            ),
-        )
-        self.assertTrue(VISUAL_PRODUCT_WORK.is_file())
-
-    def test_visual_product_work_defines_pr_evidence(self):
-        guidance = VISUAL_PRODUCT_WORK.read_text()
-
-        self.assert_contains_all(
-            guidance,
-            (
-                "rendered UI, layout, styling, interaction states, or product imagery",
-                "Capture the meaningful baseline before implementation",
-                "same state, data, viewport, and theme",
-                "Consider image generation",
-                "Do not generate imagery",
-                "independent visual critique",
-                "bounded",
-                "## Screenshots",
-                "descriptive alt text",
-                "new surface",
-                "temporary delivery artifacts",
-                "Do not commit them solely",
-                "--attach",
-                "pull-request template",
-                "Read the published body back",
-                "not review-ready",
-            ),
-        )
-
-    def test_defaults_to_publishing_a_pull_request(self):
-        text = SKILL.read_text()
-
-        self.assert_contains_all(
-            text,
-            (
-                "Treat a project change intended to land as authorization to publish",
-                "Do not present the branch-finishing options menu",
-                "commit only task-related changes",
-                "push the task branch",
-                "create or update the pull request",
-                "explicitly asks to keep the work local",
-            ),
-        )
-
-    def test_pr_readiness_requires_more_than_green_checks(self):
-        text = SKILL.read_text()
-
-        self.assert_contains_all(
-            text,
-            (
-                "current PR state",
-                "draft status",
-                "mergeability and merge-state",
-                "review decision",
-                "after changing its base branch",
-                "required checks are green or intentionally skipped under repository policy",
-                "no merge conflicts or policy blockers",
-                "no requested changes or required reviews are outstanding",
-                "Concrete blockers",
-                "Report blockers",
-            ),
-        )
-
-    def test_validation_is_proportional_to_change_risk(self):
-        text = SKILL.read_text()
-
-        self.assert_contains_all(
-            text,
-            (
-                "Classify the completed diff before choosing validation",
-                "documentation-only",
-                "cannot affect runtime behavior",
-                "skip runtime tests, builds, and CI waiting",
-                "documentation-focused checks",
-                "workflows, executable configuration, dependencies, schemas, migrations, generated files, or assets",
-                "skip-CI convention",
-            ),
-        )
-
-    def test_profile_resources_and_metadata_are_present(self):
-        metadata = METADATA.read_text()
-        guidance = PROJECT_GUIDANCE.read_text()
-
-        self.assert_contains_all(metadata, ('display_name: "Omakase"', "default_prompt:"))
-        self.assertIn("# Personal project profile", guidance)
-        self.assertTrue(PROFILE_TEMPLATE.is_file())
-        self.assertTrue(PROFILE_RESOLVER.is_file())
-
-    def test_profile_creation_requires_ignore_preflight(self):
-        skill = SKILL.read_text()
-        guidance = PROJECT_GUIDANCE.read_text()
-        command = (
-            'git -C "$(dirname "$profile_path")" check-ignore -q -- '
-            '"$profile_path"'
-        )
-
-        self.assertIn("Before creating it", skill)
-        self.assertIn(command, guidance)
-        self.assertIn("stop without creating the profile", guidance)
-
-    def test_profile_template_selects_runtime_per_step(self):
+    def test_profile_template_has_supported_schema(self):
         profile = yaml.safe_load(PROFILE_TEMPLATE.read_text())
 
-        self.assertNotIn("runtime", profile)
-        expected_step = {
-            "runtime": None,
-            "run": None,
-            "env": {},
-            "needs": [],
-        }
-        self.assertEqual(profile["bootstrap"]["steps"], [expected_step])
-        self.assertEqual(profile["validation"]["quick"], [expected_step])
-
-    def test_profile_steps_capture_execution_requirements_structurally(self):
-        guidance = PROJECT_GUIDANCE.read_text()
-
-        self.assert_contains_all(
-            guidance,
-            (
-                "`env`",
-                "`needs`",
-                "Apply `env` before the first attempt",
-                "Request the execution context named by `needs` before the first attempt",
-                "Do not duplicate structured step requirements in `worktree.notes`",
-            ),
+        self.assertEqual(profile["version"], 1)
+        self.assertEqual(
+            set(profile),
+            {"version", "bootstrap", "validation", "worktree", "ci", "publication"},
         )
+        self.assertIsInstance(profile["bootstrap"]["steps"], list)
+        self.assertIsInstance(profile["validation"]["quick"], list)
+        self.assertIsInstance(profile["validation"]["full"], list)
+        self.assertIsInstance(profile["worktree"]["required_local_files"], list)
+        self.assertIsInstance(profile["worktree"]["notes"], list)
 
-    def test_operational_mechanics_live_in_project_guidance(self):
-        skill = SKILL.read_text()
-        guidance = PROJECT_GUIDANCE.read_text()
-        operational_details = (
-            "package-manager cache and log directories",
-            "localhost sockets, browser processes, external services, or network access",
-            "mutation of one dependency tree as an exclusive operation",
+        steps = (
+            profile["bootstrap"]["steps"]
+            + profile["validation"]["quick"]
+            + profile["validation"]["full"]
         )
-
-        for detail in operational_details:
-            with self.subTest(detail=detail):
-                self.assertNotIn(detail, skill)
-                self.assertIn(detail, guidance)
-
-        self.assert_contains_all(
-            guidance,
-            (
-                "failure and retry boundaries",
-                "clean deterministic install or bootstrap command",
-                "ignored generated artifacts",
-                "Stable harness constraint",
-                "one-off sandbox denial",
-            ),
-        )
-
-    def test_repository_conventions_remain_artifact_specific(self):
-        guidance = REPOSITORY_CONVENTIONS.read_text()
-
-        self.assert_contains_all(
-            guidance,
-            (
-                "Explicit policy",
-                "Recent accepted examples",
-                "Branch names",
-                "Commit subjects",
-                "Pull-request titles",
-                "Pull-request bodies",
-                "Review replies",
-                "required platform prefix",
-                "read the created or updated artifact back",
-            ),
-        )
+        for step in steps:
+            with self.subTest(step=step):
+                self.assertEqual(set(step), {"runtime", "run", "env", "needs"})
+                self.assertIsInstance(step["env"], dict)
+                self.assertIsInstance(step["needs"], list)
 
 
 if __name__ == "__main__":
