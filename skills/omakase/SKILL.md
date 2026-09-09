@@ -47,7 +47,9 @@ Before editing:
 4. Inspect Git status and preserve unrelated changes.
 5. Ask only when missing information materially changes the result.
 
-Implementation is isolated by default. If the task already runs in a clean task-specific worktree, reuse it rather than acquiring another. Otherwise, Treehouse is the required provisioning layer: read [references/treehouse-worktrees.md](references/treehouse-worktrees.md), verify its required lease interface, and create an isolated worktree from its project-local pool. Do not silently fall back to a raw Git worktree when Treehouse is missing or incompatible; report the prerequisite and request the smallest action needed to restore it.
+When the repository uses a project-local Treehouse pool, opportunistically reconcile landed allocations during intake through [the Treehouse lifecycle](references/treehouse-worktrees.md). This maintenance does not change which provisioning environment owns the current task's workspace.
+
+Implementation is isolated by default. If the task already runs in a clean task-specific worktree, reuse it rather than acquiring another. Otherwise, Treehouse is the required provisioning layer: read the Treehouse lifecycle reference, verify its required lease interface, and create an isolated worktree from its project-local pool. Do not silently fall back to a raw Git worktree when Treehouse is missing or incompatible; report the prerequisite and request the smallest action needed to restore it.
 
 Isolation remains environment separation only: the Omakase profile owns setup and validation. Preserve either workspace while its pull request is open. For a pre-existing task worktree, leave its cleanup to the provisioning environment; for an Omakase-acquired lease, follow the identity-checked return rules in the Treehouse reference after landing. Never nest worktrees or alter unrelated ones. Remote branch deletion requires explicit authorization.
 
@@ -91,7 +93,7 @@ Whenever assessing GitHub status, read the current PR state, draft status, merge
 
 When a documentation-only change validly uses a skip-CI convention, confirm the published artifact and current PR state once; do not wait for or schedule CI that was intentionally skipped.
 
-If required checks or mergeability are pending, schedule a follow-up in the current Codex task carrying the repository and PR URL, branch and worktree, pending conditions, completed validation, and next permitted action. Concrete blockers such as conflicts, failed checks, draft status, or unsatisfied review requirements must be reported and handled or escalated as appropriate. Stop follow-up when the PR becomes ready, closes or merges, or attention is required.
+If required checks or mergeability are pending, schedule a follow-up in the current Codex task carrying the repository and PR URL, branch and worktree, pending conditions, completed validation, and next permitted action. Concrete blockers such as conflicts, failed checks, draft status, or unsatisfied review requirements must be reported and handled or escalated as appropriate. Stop follow-up when the PR becomes ready, closes or merges, or attention is required. Do not keep monitoring a ready PR solely to reclaim its Treehouse lease after an expected external merge; a later Omakase task will reconcile landed allocations before it acquires isolation.
 
 For CI failures, gather logs and commit state, debug the root cause, repair clear in-scope failures in the same worktree, validate, push, and resume monitoring. For review feedback, fetch the full context, verify each request against the code and task, implement clear in-scope requests, validate, push, and resume monitoring. Escalate conflicting or materially ambiguous feedback.
 
