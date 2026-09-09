@@ -34,8 +34,8 @@ Changes to `skills/omakase/` therefore apply to the installed skill without a se
 - `skills/omakase/scripts/` contains deterministic helper scripts.
 - `skills/omakase/agents/` contains Codex-facing display metadata.
 - `scripts/` contains repository-level validation entry points.
-- `tests/` verifies the skill contract and helpers.
-- `evals/` records behavioral scenarios that should remain true.
+- `tests/` verifies executable behavior and repository structure.
+- `evals/` records categorized manual behavioral scenarios; CI validates their structure but does not execute them.
 
 Temporary design specs and implementation plans are working artifacts, not maintained repository documentation.
 

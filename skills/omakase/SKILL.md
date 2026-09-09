@@ -53,7 +53,7 @@ Isolation remains environment separation only: the Omakase profile owns setup an
 
 ## Personal project profile
 
-Each repository may have one globally ignored `.omakase.local.yml` in its primary checkout, shared by linked worktrees. Resolve it from this skill directory with:
+Each repository may have one globally ignored `.omakase.local.yml` in its primary checkout, shared by linked worktrees. Resolve it from this skill directory with [scripts/profile_path.py](scripts/profile_path.py):
 
 ```bash
 python3 scripts/profile_path.py --repo <checkout-or-worktree>
