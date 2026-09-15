@@ -1,17 +1,20 @@
 # Omakase
 
-Omakase is a personal Codex conductor skill for coding work that is intended to land. Codex remains the application and coding agent; Omakase supplies consistent defaults for isolation, project setup, validation, publication, CI follow-up, and review follow-up.
+Omakase is a personal Codex conductor skill for engineering work, from investigation and disposable prototypes through reviewed project delivery. Codex remains the application and coding agent; Omakase supplies opinionated scoping, workflow selection, project tool preferences, and a concise learning loop alongside isolation, setup, validation, publication, and follow-up.
 
 It is deliberately not a second agent harness, issue tracker, daemon, or replacement UI.
 
 ## What it coordinates
 
-- Its own lean delivery workflow for planning, isolation, validation, review, and publication
+- A compact task brief covering outcome, boundaries, uncertainties, proof, and next steps
+- Explicit investigation, prototype, bug fix, feature, refactor, performance, and read-only review workflows
+- Shared delivery steps for isolation, validation, independent review, publication, and follow-up
 - Optional specialized skills, including Superpowers, when explicitly requested or justified by scale, risk, or repository policy
 - GitHub tooling for issues, pull requests, checks, and Actions evidence
 - Repository-approved integrations for issue and internal-service context when available
 - Codex scheduled follow-ups for pending CI and review work
-- A globally ignored `.omakase.local.yml` for verified machine-local project knowledge
+- Personal defaults that improve from explicit user corrections
+- A globally ignored `.omakase.local.yml` for project tool preferences, standing project corrections, and verified machine-local knowledge
 - Treehouse as the required reusable-worktree layer when Codex has not already isolated the task
 
 ## Installation
@@ -36,6 +39,16 @@ Changes to `skills/omakase/` therefore apply to the installed skill without a se
 - `scripts/` contains repository-level validation entry points.
 - `tests/` verifies executable behavior and repository structure.
 - `evals/` records categorized manual behavioral scenarios; CI validates their structure but does not execute them.
+
+## Scope, tools, and learning
+
+Investigations finish with supported findings and recommendations. Disposable prototypes finish with demonstrated decision evidence and production limitations. Neither automatically enters publication. Production transitions refresh the scope and use the authority already provided by the user.
+
+Read-only work can use the current checkout without a lease or setup. Prototype writes and production implementation use isolation. Missing optional `tools` and `preferences` fields in existing version 1 profiles inherit personal defaults; projects can override only the purposes they need. Tool configuration describes preferences and evidence gates, not credentials, tool availability, or permission to perform external actions.
+
+Explicit corrections persist at their stated personal or project scope when editing is authorized; inferred preferences remain proposals until confirmed. Verified operational discoveries belong in the project profile. See the skill's personal defaults, workflow, and project guidance references for details.
+
+Long-running project orchestration is a future goal. Current scheduled follow-ups address pending CI and review. Behavioral scenarios remain manual; structural checks do not prove agent compliance.
 
 Temporary design specs and implementation plans are working artifacts, not maintained repository documentation.
 

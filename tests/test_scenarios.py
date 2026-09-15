@@ -18,6 +18,10 @@ AREAS = {
     "triggering",
     "validation",
     "visual",
+    "scoping",
+    "workflow",
+    "tools",
+    "learning",
 }
 
 
