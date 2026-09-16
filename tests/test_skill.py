@@ -69,8 +69,13 @@ class OmakaseSkillStructureTest(unittest.TestCase):
         self.assertEqual(profile["version"], 1)
         self.assertEqual(
             set(profile),
-            {"version", "bootstrap", "validation", "worktree", "ci", "publication"},
+            {
+                "version", "bootstrap", "validation", "worktree", "ci",
+                "publication", "tools", "preferences",
+            },
         )
+        self.assertIsInstance(profile["tools"], dict)
+        self.assertIsInstance(profile["preferences"], list)
         self.assertIsInstance(profile["bootstrap"]["steps"], list)
         self.assertIsInstance(profile["validation"]["quick"], list)
         self.assertIsInstance(profile["validation"]["full"], list)

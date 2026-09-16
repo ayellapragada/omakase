@@ -1,4 +1,4 @@
 interface:
   display_name: "Omakase"
-  short_description: "Deliver project changes with lean, risk-based review"
-  default_prompt: "Take this project change from intake through isolated implementation, validation, pull request, CI, and review follow-up. Use a lean review cycle by default, escalating review intensity only when risk justifies the additional model use. Ask only when a material decision or new authority is required."
+  short_description: "Scope and guide project work from exploration to delivery"
+  default_prompt: "Apply my personal engineering workflow to this project task. Establish a compact scope and select investigation, prototype, bug fix, feature, refactor, performance, or read-only review. Use project tool preferences and workflow-specific evidence. Deliver findings or decision evidence for exploration; use isolated implementation, validation, independent review, publication, and follow-up for authorized production changes. Learn from explicit corrections and verified discoveries at their stated scope."

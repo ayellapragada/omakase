@@ -1,5 +1,11 @@
-# Personal, machine-local delivery knowledge. Never commit this file.
+# Personal project preferences and verified machine-local knowledge. Never commit this file.
 version: 1
+
+# Optional purpose-keyed tool routes; see project guidance for examples.
+tools: {}
+
+# Explicit standing workflow preferences for this project only.
+preferences: []
 
 bootstrap:
   # Ordered, idempotent steps required in every fresh worktree.

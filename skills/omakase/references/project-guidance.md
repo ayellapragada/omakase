@@ -1,8 +1,8 @@
 # Personal project profile
 
-`.omakase.local.yml` is Omakase's personal, machine-local operational memory for one Git repository. It captures the small amount of setup and delivery knowledge that is repeatedly rediscovered in isolated worktrees. It must be globally ignored and never committed.
+`.omakase.local.yml` is Omakase's personal project preferences and machine-local operational memory for one Git repository. It captures the small amount of setup and delivery knowledge that is repeatedly rediscovered in isolated worktrees. It must be globally ignored and never committed.
 
-The profile supplements rather than replaces `AGENTS.md`, repository documentation, CI configuration, or user instructions. Those sources define shared project policy and take precedence. The profile is appropriate for machine-specific commands, local prerequisite paths, worktree caveats, and verified shortcuts.
+The profile supplements rather than replaces `AGENTS.md`, repository documentation, CI configuration, or user instructions. Those sources define shared project policy and take precedence. The profile is appropriate for explicit project workflow preferences, purpose-specific tool choices, machine-specific commands, local prerequisite paths, worktree caveats, and verified shortcuts. Missing optional `tools` and `preferences` fields in existing version 1 profiles behave as empty values.
 
 ## One profile across worktrees
 
@@ -16,7 +16,7 @@ The resolver returns the first checkout reported by `git worktree list --porcela
 
 ## Generate when missing
 
-When a repository has no profile, Codex should create a minimal one without turning setup into an onboarding interview:
+When a repository has no profile and persistence is allowed by the task, Codex should create a minimal one without turning setup into an onboarding interview. Read-only work can use inferred context without creating a file; do not run bootstrap merely to populate a profile for an investigation. For delivery setup:
 
 1. Before writing, verify that Git ignores the resolved path:
 
@@ -39,6 +39,8 @@ Established repository entry points can be used without a redundant confirmation
 The schema is intentionally small and extensible:
 
 - `version`: profile format version; currently `1`.
+- `tools`: optional mapping from purpose to ordered tool preferences, required evidence and permitted fallbacks; see below.
+- `preferences`: optional list of explicit standing workflow preferences for this project; these supplement personal defaults under higher-priority instructions.
 - `bootstrap.steps`: ordered idempotent entries required to make a fresh worktree usable.
 - `validation.quick`: focused or inexpensive checks used during implementation.
 - `validation.full`: the local completion checks.
@@ -85,3 +87,31 @@ Do not update the profile merely because a command failed. First classify the ca
 - Unsafe or uncertain: secret acquisition, novel host mutation, infrastructure changes, or a speculative workaround. Ask for the smallest required decision before proceeding.
 
 Keep the file concise. Delete stale instructions when repository automation makes them unnecessary.
+
+## Project tools
+
+Resolve a tool route per purpose needed by the task, not an inventory to invoke on every run. Precedence is current user instructions, applicable repository policy, explicit project profile choices, then personal defaults. Within a route, check `preferred` in order against available capabilities and project authorization. If none can serve the purpose, use a listed `fallback` only when it supplies appropriate evidence and complies with policy. An omitted route inherits personal defaults; an explicit empty route disables default service selection for that purpose and uses only locally available evidence until clarified.
+
+Each purpose has an optional `preferred` list, `fallback` list and `required` boolean (default false). Purpose keys and tool names are descriptive, not guessed MCP action identifiers. The agent interprets this profile; there is no new tool router or plugin installer. Resolve actual tools through the sanctioned discovery mechanism. A route can describe an MCP service, CLI, repository entry point, browser, or local evidence source. Do not store credentials or executable setup for novel integrations.
+
+For example, a work project might use:
+
+```yaml
+tools:
+  issue_context:
+    preferred: [the approved issue-tracker integration]
+    fallback: [local issue notes]
+    required: true
+  runtime_evidence:
+    preferred: [the approved observability integration]
+    required: false
+  publication:
+    preferred: [authenticated GitHub integration]
+    fallback: [host GitHub CLI]
+preferences:
+  - Show the caller flow and scope before implementation.
+```
+
+A personal project might instead override `issue_context` with GitHub issues and `runtime_evidence` with a local browser or application logs. Arbitrary purpose keys let projects name their own needs without changing the schema.
+
+`required: true` means the purpose’s evidence or capability is a gate for dependent decisions, not that a preferred vendor must be used. A sanctioned fallback can satisfy it only if its evidence is sufficient. If blocked, name the unavailable tool, missing evidence and affected step; continue independent local discovery and ask only for the missing material input. Optional unavailable routes reduce the evidence available; report the limitation and proceed where the task remains supportable. If the missing evidence prevents a workflow’s finish condition, that workflow remains inconclusive even when the route is optional. Never bypass a service write refusal or install/configure integrations solely because a profile names them.
