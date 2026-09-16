@@ -2,6 +2,8 @@
 
 Omakase is a personal Codex conductor skill for coding work that is intended to land. Codex remains the application and coding agent; Omakase supplies consistent defaults for isolation, project setup, validation, publication, CI follow-up, and review follow-up.
 
+This repository is shared for reference. It is built for my own environment and workflow, not maintained as a general-purpose tool. There is no promise of portability, compatibility, support, or a stable interface. The setup notes below describe my usage; adapting it to another environment is up to you.
+
 It is deliberately not a second agent harness, issue tracker, daemon, or replacement UI.
 
 ## What it coordinates
@@ -14,7 +16,7 @@ It is deliberately not a second agent harness, issue tracker, daemon, or replace
 - A globally ignored `.omakase.local.yml` for verified machine-local project knowledge
 - Treehouse as the required reusable-worktree layer when Codex has not already isolated the task
 
-## Installation
+## Personal setup
 
 The active personal installation links this repository's skill directory into the shared agent-skills directory:
 
@@ -53,3 +55,7 @@ Validate the Codex skill structure:
 ```bash
 python3 scripts/validate_skill.py skills/omakase
 ```
+
+## License
+
+[MIT](LICENSE). The license permits reuse; it does not change this project's personal scope or support expectations.
